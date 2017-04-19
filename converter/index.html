@@ -29,15 +29,6 @@
 			return str;
 		}
 		
-		function convertAltCodes(str){
-			for(var i=0;i<specialChars.length;i++){
-				str = str.replace(new RegExp(specialChars[i][0], "g"),"\n"+getAltCode(i)+"\nSTRING"+" ");
-			}
-			str += "\n";
-			str = str.replace(new RegExp("STRING \n", "g"),"");
-			return str;
-		}
-		  
 		function getAltCode(num){
 			var keyStr = "ALT";
 			var code = ""+specialChars[num][1];
@@ -48,8 +39,63 @@
 			return keyStr;
 		}
 		
-		function convertScript_Alt(){
-			document.getElementById('output').value = convertAltCodes(document.getElementById('input').value);
+		function convertAltCodes(str){
+			for(var i=0;i<specialChars.length;i++){
+				str = str.replace(new RegExp(specialChars[i][0], "g"),"\n"+getAltCode(i)+"\nSTRING"+" ");
+			}
+			str += "\n";
+			str = str.replace(new RegExp("STRING \n", "g"),"");
+			return str;
+		}
+		
+		function optimize(str){
+			var lines = [];
+			var lineNum = 0;
+			
+			var line = "";
+			for(var i=0;i<str.length;i++){
+				var c = str.charAt(i);
+				if(c == "\n"){
+					lines[lineNum] = line;
+					lineNum++;
+					line = "";
+				}
+				else line += c;
+			}
+			
+			for(var i=0;i<lines.length-1;i++){
+				var h = i;
+				var same = (lines[h] == lines[h+1]);
+				var count = 0;
+				while(same && h<lines.length-1 && lines[h+1] != "undefined" && (typeof lines[h+1] !== "undefined")){
+					count++;
+					h++;
+					same = lines[h] == lines[h+1];
+				}
+				if(count > 0){
+					lines[i+1] = "REPEAT "+count;
+					var linesLen = lines.length;
+					var _linesEnd = lines.splice(i+count+1,linesLen);
+					var _linesBegin = lines.splice(0,i+2);
+					lines = _linesBegin.concat(_linesEnd);
+				}
+			}
+			
+			str = "";
+			for(var i=0;i<lines.length;i++) str += lines[i]+"\n";
+			
+			return str;
+				
+		}
+		  
+		alts = true;
+		function convert(){
+			var script = document.getElementById('input').value;
+			script = convertLineBreaks(script);
+			if(alts === true) script = convertAltCodes(script);
+			script = deleteBreaks(script);
+			script = optimize(script);
+			document.getElementById('output').value = script;
 		}
 		</script>
 	</head>
@@ -60,7 +106,7 @@
 		<div class="container">
 			<div class="row">
 				<div class="six columns">
-					<button onclick="convertScript_Alt()">convert with altcodes</button><br>
+					<button onclick="convert()">convert with altcodes</button><br>
 				</div>
 			</div>
 			<div class="row">
