@@ -4,6 +4,12 @@
 
 #define debug true // <-- uncomment to turn serial output on
 #define CSpin 4 //Chip-Select of the SD-Card reader
+
+#define dip1 6
+#define dip2 7
+#define dip3 8
+#define dip4 9
+
 #define buffersize 256
 
 #define KEYPAD_0 234
@@ -164,15 +170,15 @@ void setup() {
 
   String scriptName = ""; // Name of the file that will be opened
 
-  pinMode(6, INPUT_PULLUP);
-  pinMode(7, INPUT_PULLUP);
-  pinMode(8, INPUT_PULLUP);
-  pinMode(9, INPUT_PULLUP);
+  pinMode(dip1, INPUT_PULLUP);
+  pinMode(dip2, INPUT_PULLUP);
+  pinMode(dip3, INPUT_PULLUP);
+  pinMode(dip4, INPUT_PULLUP);
   
-  if(digitalRead(6) == LOW){scriptName += "1";} else {scriptName += "0";}
-  if(digitalRead(7) == LOW){scriptName += "1";} else {scriptName += "0";}
-  if(digitalRead(8) == LOW){scriptName += "1";} else {scriptName += "0";}
-  if(digitalRead(9) == LOW){scriptName += "1";} else {scriptName += "0";}
+  if(digitalRead(dip1) == LOW){scriptName += '1';} else {scriptName += '0';}
+  if(digitalRead(dip2) == LOW){scriptName += '1';} else {scriptName += '0';}
+  if(digitalRead(dip3) == LOW){scriptName += '1';} else {scriptName += '0';}
+  if(digitalRead(dip4) == LOW){scriptName += '1';} else {scriptName += '0';}
 
   scriptName += ".txt";
 
