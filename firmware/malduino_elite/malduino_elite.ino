@@ -2,9 +2,10 @@
 #include <SD.h>
 #include "Keyboard.h"
 
-#define debug true // <-- uncomment to turn serial output on
+//#define debug true // <-- uncomment to turn serial output on
 #define CSpin 4 //Chip-Select of the SD-Card reader
 
+//Dip-Switch Pins:
 #define dip1 6
 #define dip2 7
 #define dip3 8
@@ -35,6 +36,7 @@ int lastSize = 0;
 char buf[buffersize];
 int bufSize = 0;
 int defaultDelay = 5;
+int defaultCharDelay = 5;
 
 int getSpace(int start, int end){
   for(int i=start;i<end;i++){
@@ -57,6 +59,12 @@ int getInt(int pos){
   return amount.toInt();
 }
 
+void KeyboardWrite(uint8_t c){  
+  Keyboard.press(c);
+  delay(defaultCharDelay);
+  Keyboard.release(c);
+}
+
 void runLine(){
   #ifdef debug 
     Serial.println("run: '"+String(buf).substring(0,bufSize)+"' ("+(String)bufSize+")");
@@ -67,9 +75,10 @@ void runLine(){
   if(space == -1) runCommand(0,bufSize);
   else{
     if(equals(0,space,"DEFAULTDELAY") || equals(0,space,"DEFAULT_DELAY")) defaultDelay = getInt(space);
+    else if(equals(0,space,"DEFAULTCHARDELAY") || equals(0,space,"DEFAULT_CHAR_DELAY")) defaultCharDelay = getInt(space);
     else if(equals(0,space,"DELAY")) delay(getInt(space));
     else if(equals(0,space,"STRING")){
-      for(int i=space+1;i<bufSize;i++) Keyboard.write(buf[i]);
+      for(int i=space+1;i<bufSize;i++) KeyboardWrite(buf[i]);
     }else if(equals(0,space,"REPEAT")){
       int runs = getInt(space);
       strncpy(buf, last, lastSize);
@@ -86,7 +95,6 @@ void runLine(){
         if(nSpace == -1) nSpace = bufSize;
         runCommand(space+1,nSpace);
         space = nSpace;
-        delay(5);
       }
     }
   }
@@ -135,22 +143,22 @@ void runCommand(int s, int e){
   else if(equals(s,e,"F11")) Keyboard.press(KEY_F11);
   else if(equals(s,e,"F12")) Keyboard.press(KEY_F12);
 
-  else if(equals(s,e,"NUM_0")) Keyboard.write(KEYPAD_0);
-  else if(equals(s,e,"NUM_1")) Keyboard.write(KEYPAD_1);
-  else if(equals(s,e,"NUM_2")) Keyboard.write(KEYPAD_2);
-  else if(equals(s,e,"NUM_3")) Keyboard.write(KEYPAD_3);
-  else if(equals(s,e,"NUM_4")) Keyboard.write(KEYPAD_4);
-  else if(equals(s,e,"NUM_5")) Keyboard.write(KEYPAD_5);
-  else if(equals(s,e,"NUM_6")) Keyboard.write(KEYPAD_6);
-  else if(equals(s,e,"NUM_7")) Keyboard.write(KEYPAD_7);
-  else if(equals(s,e,"NUM_8")) Keyboard.write(KEYPAD_8);
-  else if(equals(s,e,"NUM_9")) Keyboard.write(KEYPAD_9);
-  else if(equals(s,e,"NUM_ASTERIX")) Keyboard.write(KEYPAD_ASTERIX);
-  else if(equals(s,e,"NUM_ENTER")) Keyboard.write(KEYPAD_ENTER);
-  else if(equals(s,e,"NUM_Minus")) Keyboard.write(KEYPAD_MINUS);
-  else if(equals(s,e,"NUM_PERIOD")) Keyboard.write(KEYPAD_PERIOD);
-  else if(equals(s,e,"NUM_PLUS")) Keyboard.write(KEYPAD_PLUS);
-  else if(equals(s,e,"NUM_SLASH")) Keyboard.write(KEYPAD_SLASH);
+  else if(equals(s,e,"NUM_0")) KeyboardWrite(KEYPAD_0);
+  else if(equals(s,e,"NUM_1")) KeyboardWrite(KEYPAD_1);
+  else if(equals(s,e,"NUM_2")) KeyboardWrite(KEYPAD_2);
+  else if(equals(s,e,"NUM_3")) KeyboardWrite(KEYPAD_3);
+  else if(equals(s,e,"NUM_4")) KeyboardWrite(KEYPAD_4);
+  else if(equals(s,e,"NUM_5")) KeyboardWrite(KEYPAD_5);
+  else if(equals(s,e,"NUM_6")) KeyboardWrite(KEYPAD_6);
+  else if(equals(s,e,"NUM_7")) KeyboardWrite(KEYPAD_7);
+  else if(equals(s,e,"NUM_8")) KeyboardWrite(KEYPAD_8);
+  else if(equals(s,e,"NUM_9")) KeyboardWrite(KEYPAD_9);
+  else if(equals(s,e,"NUM_ASTERIX")) KeyboardWrite(KEYPAD_ASTERIX);
+  else if(equals(s,e,"NUM_ENTER")) KeyboardWrite(KEYPAD_ENTER);
+  else if(equals(s,e,"NUM_Minus")) KeyboardWrite(KEYPAD_MINUS);
+  else if(equals(s,e,"NUM_PERIOD")) KeyboardWrite(KEYPAD_PERIOD);
+  else if(equals(s,e,"NUM_PLUS")) KeyboardWrite(KEYPAD_PLUS);
+  else if(equals(s,e,"NUM_SLASH")) KeyboardWrite(KEYPAD_SLASH);
   
   //not implemented
   //else if(equals(s,e,"APP")) Keyboard.press();
@@ -167,7 +175,7 @@ void setup() {
     delay(2000);
     Serial.println("Started!");
   #endif
-
+  
   String scriptName = ""; // Name of the file that will be opened
 
   pinMode(dip1, INPUT_PULLUP);
