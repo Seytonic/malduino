@@ -2,7 +2,7 @@
 #include <SD.h>
 #include "Keyboard.h"
 
-//#define debug true // <-- uncomment to turn serial output on
+#define debug true // <-- uncomment to turn serial output on
 #define CSpin 4 //Chip-Select of the SD-Card reader
 #define buffersize 256
 
@@ -74,10 +74,14 @@ void runLine(){
     }
     else if(equals(0,space,"REM")){}
     else{
-      do{
-        runCommand(0,space);
-        space = getSpace(space+1,bufSize);
-      }while(space >= 0);
+      runCommand(0,space);
+      while(space >= 0 && space < bufSize){
+        int nSpace = getSpace(space+1,bufSize);
+        if(nSpace == -1) nSpace = bufSize;
+        runCommand(space+1,nSpace);
+        space = nSpace;
+        delay(5);
+      }
     }
   }
   
@@ -88,7 +92,7 @@ void runLine(){
 void runCommand(int s, int e){
 
   #ifdef debug 
-    Serial.println("Press "+String(buf).substring(s,e));
+    Serial.println("Press '"+String(buf).substring(s,e)+"'");
   #endif
   
   if(s == e) Keyboard.press(buf[s]);
@@ -125,23 +129,23 @@ void runCommand(int s, int e){
   else if(equals(s,e,"F11")) Keyboard.press(KEY_F11);
   else if(equals(s,e,"F12")) Keyboard.press(KEY_F12);
 
-  else if(equals(s,e,"NUM_0")) Keyboard.press(KEYPAD_0);
-  else if(equals(s,e,"NUM_1")) Keyboard.press(KEYPAD_1);
-  else if(equals(s,e,"NUM_2")) Keyboard.press(KEYPAD_2);
-  else if(equals(s,e,"NUM_3")) Keyboard.press(KEYPAD_3);
-  else if(equals(s,e,"NUM_4")) Keyboard.press(KEYPAD_4);
-  else if(equals(s,e,"NUM_5")) Keyboard.press(KEYPAD_5);
-  else if(equals(s,e,"NUM_6")) Keyboard.press(KEYPAD_6);
-  else if(equals(s,e,"NUM_7")) Keyboard.press(KEYPAD_7);
-  else if(equals(s,e,"NUM_8")) Keyboard.press(KEYPAD_8);
-  else if(equals(s,e,"NUM_9")) Keyboard.press(KEYPAD_9);
-  else if(equals(s,e,"NUM_ASTERIX")) Keyboard.press(KEYPAD_ASTERIX);
-  else if(equals(s,e,"NUM_ENTER")) Keyboard.press(KEYPAD_ENTER);
-  else if(equals(s,e,"NUM_Minus")) Keyboard.press(KEYPAD_MINUS);
-  else if(equals(s,e,"NUM_PERIOD")) Keyboard.press(KEYPAD_PERIOD);
-  else if(equals(s,e,"NUM_PLUS")) Keyboard.press(KEYPAD_PLUS);
-  else if(equals(s,e,"NUM_SLASH")) Keyboard.press(KEYPAD_SLASH);
-
+  else if(equals(s,e,"NUM_0")) Keyboard.write(KEYPAD_0);
+  else if(equals(s,e,"NUM_1")) Keyboard.write(KEYPAD_1);
+  else if(equals(s,e,"NUM_2")) Keyboard.write(KEYPAD_2);
+  else if(equals(s,e,"NUM_3")) Keyboard.write(KEYPAD_3);
+  else if(equals(s,e,"NUM_4")) Keyboard.write(KEYPAD_4);
+  else if(equals(s,e,"NUM_5")) Keyboard.write(KEYPAD_5);
+  else if(equals(s,e,"NUM_6")) Keyboard.write(KEYPAD_6);
+  else if(equals(s,e,"NUM_7")) Keyboard.write(KEYPAD_7);
+  else if(equals(s,e,"NUM_8")) Keyboard.write(KEYPAD_8);
+  else if(equals(s,e,"NUM_9")) Keyboard.write(KEYPAD_9);
+  else if(equals(s,e,"NUM_ASTERIX")) Keyboard.write(KEYPAD_ASTERIX);
+  else if(equals(s,e,"NUM_ENTER")) Keyboard.write(KEYPAD_ENTER);
+  else if(equals(s,e,"NUM_Minus")) Keyboard.write(KEYPAD_MINUS);
+  else if(equals(s,e,"NUM_PERIOD")) Keyboard.write(KEYPAD_PERIOD);
+  else if(equals(s,e,"NUM_PLUS")) Keyboard.write(KEYPAD_PLUS);
+  else if(equals(s,e,"NUM_SLASH")) Keyboard.write(KEYPAD_SLASH);
+  
   //not implemented
   //else if(equals(s,e,"APP")) Keyboard.press();
   //else if(equals(s,e,"MENU")) Keyboard.press();
