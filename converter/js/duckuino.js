@@ -103,7 +103,7 @@ class Duckuino {
     // Check if there is any code input at all
     if (inputCode == '' || inputCode == undefined)
     {
-      console.error('Error: No ducky script was entered!');
+      error('Error: No ducky script was entered!');
       return 'Error, look at the console...';
     } 
 
@@ -114,7 +114,7 @@ class Duckuino {
     } 
 
     // Build the Arduino code skeleton
-    return '#include <Keyboard.h>\n'
+    return '#include "Keyboard.h"\n'
 	+ '\n'
 	+ 'int defaultDelay = 5;\n'
 	+ 'int defaultCharDelay = 5;\n'
@@ -156,7 +156,7 @@ class Duckuino {
       // Line empty, skip
       if (lineArray[i] === '' || lineArray[i] === '\n')
       {
-        console.log('Info: Skipped line ' + (i + 1) + ', because was empty.');
+        log('Info: Skipped line ' + (i + 1) + ', because was empty.');
         continue;
       }
 
@@ -192,7 +192,7 @@ class Duckuino {
             parsedOut += '  Keyboard.print("' + textString + '");\n';
             commandKnown = true;
           } else {
-            console.error('Error: at line: ' + (i + 1) + ', STRING needs a text');
+            error('Error: at line: ' + (i + 1) + ', STRING needs a text');
             return;
           }
           break;
@@ -200,7 +200,7 @@ class Duckuino {
           wordArray.shift();
 
           if(wordArray[0] === undefined || wordArray[0] === '') {
-            console.error('Error: at line: ' + (i + 1) + ', DELAY needs a time');
+            error('Error: at line: ' + (i + 1) + ', DELAY needs a time');
             return;
           }
 
@@ -209,7 +209,7 @@ class Duckuino {
             parsedOut += '  delay(' + wordArray[0] + ');\n';
             commandKnown = true;
           } else {
-            console.error('Error: at line: ' + (i + 1) + ', DELAY only acceptes numbers');
+            error('Error: at line: ' + (i + 1) + ', DELAY only acceptes numbers');
             return;
           }
           break;
@@ -218,7 +218,7 @@ class Duckuino {
           wordArray.shift();
 
           if(wordArray[0] === undefined || wordArray[0] === '') {
-            console.error('Error: at line: ' + (i + 1) + ', DEFAULTDELAY needs a time');
+            error('Error: at line: ' + (i + 1) + ', DEFAULTDELAY needs a time');
             return;
           }
 
@@ -227,7 +227,7 @@ class Duckuino {
             parsedOut += '  defaultDelay = ' + wordArray[0] + ';\n';
             commandKnown = true;
           } else {
-            console.error('Error: at line: ' + (i + 1) + ', DEFAULTDELAY only acceptes numbers');
+            error('Error: at line: ' + (i + 1) + ', DEFAULTDELAY only acceptes numbers');
             return;
           }
           break;
@@ -236,7 +236,7 @@ class Duckuino {
           wordArray.shift();
 
           if(wordArray[0] === undefined || wordArray[0] === '') {
-            console.error('Error: at line: ' + (i + 1) + ', DEFAULTCHARDELAY needs a time');
+            error('Error: at line: ' + (i + 1) + ', DEFAULTCHARDELAY needs a time');
             return;
           }
 
@@ -245,7 +245,7 @@ class Duckuino {
             parsedOut += '  defaultCharDelay = ' + wordArray[0] + ';\n';
             commandKnown = true;
           } else {
-            console.error('Error: at line: ' + (i + 1) + ', DEFAULTCHARDELAY only acceptes numbers');
+            error('Error: at line: ' + (i + 1) + ', DEFAULTCHARDELAY only acceptes numbers');
             return;
           }
           break;
@@ -253,7 +253,7 @@ class Duckuino {
           wordArray.shift();
 
           if(wordArray[0] === undefined || wordArray[0] === '') {
-            console.error('Error: at line: ' + (i + 1) + ', TYPE needs a key');
+            error('Error: at line: ' + (i + 1) + ', TYPE needs a key');
             return;
           }
 
@@ -263,7 +263,7 @@ class Duckuino {
             // Replace the DuckyScript key by the Arduino key name
             parsedOut += '  typeKey(' + keyMap[wordArray[0]] + ');\n';
           } else {
-            console.error('Error: Unknown letter \'' + wordArray[0] +'\' at line: ' + (i + 1));
+            error('Error: Unknown letter \'' + wordArray[0] +'\' at line: ' + (i + 1));
             return;
           }
           break;
@@ -276,7 +276,7 @@ class Duckuino {
             commandKnown = true;
             parsedOut += '  // ' + wordArray.join(' ') + '\n';
           } else {
-            console.error('Error: at line: ' + (i + 1) + ', REM needs a comment');
+            error('Error: at line: ' + (i + 1) + ', REM needs a comment');
             return;
           }
           break;
@@ -294,7 +294,7 @@ class Duckuino {
             parsedOut += ');\n';
             wordArray.shift();
           } else {
-            console.error('Error: at line: ' + (i + 1) + ', MOUSEMOVE requires at least two parameters')
+            error('Error: at line: ' + (i + 1) + ', MOUSEMOVE requires at least two parameters')
             return;
           }
           break;       
@@ -307,7 +307,7 @@ class Duckuino {
             parsedOut += '  AbsoluteMouse.click(MOUSE_'+wordArray[0]+');\n'
             wordArray.shift();
           } else {
-            console.error('Error: at line: ' + (i + 1) + ', MOUSECLICK requires key (left/middle/right)')
+            error('Error: at line: ' + (i + 1) + ', MOUSECLICK requires key (left/middle/right)')
             return;
           }
           break;
@@ -316,13 +316,13 @@ class Duckuino {
           wordArray.shift();
 
           if (wordArray[0] === undefined || wordArray[0] === '') {
-            console.error('Error: at line: ' + (i + 1) + ', REPEAT/REPLAY needs a loop count');
+            error('Error: at line: ' + (i + 1) + ', REPEAT/REPLAY needs a loop count');
             return;
           }
 
           if (lastLines === undefined)
           {
-            console.error('Error: at line: ' + (i + 1) + ', nothing to repeat, this is the first line.');
+            error('Error: at line: ' + (i + 1) + ', nothing to repeat, this is the first line.');
             return;
           }
 
@@ -348,7 +348,7 @@ class Duckuino {
 
             commandKnown = true;
           } else {
-            console.error('Error: at line: ' + (i + 1) + ', REPEAT/REPLAY only acceptes numbers');
+            error('Error: at line: ' + (i + 1) + ', REPEAT/REPLAY only acceptes numbers');
             return;
           }
           break;
@@ -402,7 +402,7 @@ class Duckuino {
 
       if (!commandKnown)
       {
-        console.error('Error: Unknown command or key \'' + wordArray[0] + '\' at line: ' + (i + 1) + '.');
+        error('Error: Unknown command or key \'' + wordArray[0] + '\' at line: ' + (i + 1) + '.');
         return;
       }
 
@@ -418,7 +418,7 @@ class Duckuino {
     var timerEnd = Date.now();
     var timePassed = new Date(timerEnd - timerStart);
 
-    console.log('Successfuly parsed ' + (lineArray.length) + ' lines in ' + timePassed.getMilliseconds() + 'ms');
+    log('Successfuly parsed ' + (lineArray.length) + ' lines in ' + timePassed.getMilliseconds() + 'ms');
     return parsedScript;
   }
 }
