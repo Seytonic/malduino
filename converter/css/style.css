@@ -1,3 +1,7 @@
+html {
+  overflow-y: scroll;
+}
+
 #header{
 	width: 100%;
 	background: #323232;
@@ -10,6 +14,11 @@
 	border-radius: 4px;
 	margin-bottom: 1rem;
 	padding: 1rem;
+}
+#downloadBtn{
+	width: 100%;
+	font-size: 1.5rem;
+	height: 4rem;
 }
 #modelSelection{
 	margin-bottom: 1rem;
@@ -30,6 +39,13 @@
 	background: #1EAEDB;
 	border-bottom: 3px solid #A40001;
 	border-top: 3px solid #1EAEDB;
+}
+.modelOption:hover{
+	background: #1EAEDB;
+}
+.selected:hover{
+	background: #2293B6;
+	border-top: 3px solid #2293B6;
 }
 .modelOption:hover a,
 .modelOption.selected a{

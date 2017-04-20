@@ -27,10 +27,10 @@
 		<div class="container">
 		
 			<div class="row" id="modelSelection">
-				<div class="modelOption selected" onclick="alert()">
+				<div class="modelOption selected" onclick="changeModel(true)" id="lite">
 					<a>LITE</a>
 				</div>
-				<div class="modelOption" onclick="alert()">
+				<div class="modelOption" onclick="changeModel(false)" id="elite">
 					<a>ELITE</a>
 				</div>
 			</div>
@@ -91,8 +91,7 @@
 							</div>
 						</div>
 						
-					
-					
+						<!--
 						<div class="twelve columns">
 							<div class="one-half column">
 								<label for="keyboardLayout">Keyboard Layout + Firmware</label>
@@ -115,6 +114,8 @@
 								<a class="button button-primary">ELITE</a>
 							</div>
 						</div>
+						-->
+						
 					</form>
 				</div>
 			</div>
@@ -127,22 +128,10 @@
 					<textarea id="output"></textarea><br />
 				</div>
 			</div>
+			
+			<div class="row">
+				<button class="button-primary" id="downloadBtn">Download</button>
+			</div>
 		</div>
 	</body>
-	<script>
-		var settings = document.getElementById("settings");
-		var altCodes = document.getElementById("convertALTCodes");
-		var optimizeSetting = document.getElementById("optimize");
-		var delay = document.getElementById("delay");
-		var autoCorrectSetting = document.getElementById("autoCorrect");
-		var deleteCommentsSetting = document.getElementById("deleteComments");
-		
-		var settingsOn = false;
-		function openSettings(){
-			if(!settingsOn) settings.style.display = 'block';
-			else settings.style.display = 'none';
-			settingsOn = !settingsOn;
-		}
-		
-	</script>
 </html>
