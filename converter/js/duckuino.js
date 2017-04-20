@@ -104,13 +104,13 @@ class Duckuino {
     if (inputCode == '' || inputCode == undefined)
     {
       error('Error: No ducky script was entered!');
-      return 'Error, look at the console...';
+      return 'Error, look at the output below...';
     } 
 
     var parsedDucky = this.parser(inputCode);
     if (parsedDucky == '' || parsedDucky == undefined)
     {
-      return 'Error, look at the console...';
+      return 'Error, look at the output below...';
     } 
 
     // Build the Arduino code skeleton
@@ -134,7 +134,11 @@ class Duckuino {
     + '    \n'
     + '    Keyboard.begin();\n'
     + '    \n'
+    + '    /* ----- Begin-Script -----*/\n'
+    + '    \n'
     + parsedDucky
+    + '    \n'
+    + '    /* ----- End-Script -----*/\n'
     + '    \n'
     + '    Keyboard.end();\n'
     + '  }\n'
@@ -195,7 +199,7 @@ class Duckuino {
           textString = textString.split('\\').join('\\\\').split('"').join('\\"');
           if (textString !== '')
           {
-            parsedOut += '  Keyboard.print("' + textString + '");\n';
+            parsedOut += '    Keyboard.print("' + textString + '");\n';
             commandKnown = true;
           } else {
             error('Error: at line: ' + (i + 1) + ', STRING needs a text');
@@ -212,7 +216,7 @@ class Duckuino {
 
           if (! isNaN(wordArray[0]))
           {
-            parsedOut += '  delay(' + wordArray[0] + ');\n';
+            parsedOut += '    delay(' + wordArray[0] + ');\n';
             commandKnown = true;
           } else {
             error('Error: at line: ' + (i + 1) + ', DELAY only acceptes numbers');
@@ -230,7 +234,7 @@ class Duckuino {
 
           if (! isNaN(wordArray[0]))
           {
-            parsedOut += '  defaultDelay = ' + wordArray[0] + ';\n';
+            parsedOut += '    defaultDelay = ' + wordArray[0] + ';\n';
             commandKnown = true;
           } else {
             error('Error: at line: ' + (i + 1) + ', DEFAULTDELAY only acceptes numbers');
@@ -248,7 +252,7 @@ class Duckuino {
 
           if (! isNaN(wordArray[0]))
           {
-            parsedOut += '  defaultCharDelay = ' + wordArray[0] + ';\n';
+            parsedOut += '    defaultCharDelay = ' + wordArray[0] + ';\n';
             commandKnown = true;
           } else {
             error('Error: at line: ' + (i + 1) + ', DEFAULTCHARDELAY only acceptes numbers');
@@ -267,7 +271,7 @@ class Duckuino {
           {
             commandKnown = true;
             // Replace the DuckyScript key by the Arduino key name
-            parsedOut += '  typeKey(' + keyMap[wordArray[0]] + ');\n';
+            parsedOut += '    typeKey(' + keyMap[wordArray[0]] + ');\n';
           } else {
             error('Error: Unknown letter \'' + wordArray[0] +'\' at line: ' + (i + 1));
             return;
@@ -280,7 +284,7 @@ class Duckuino {
           if (wordArray[0] !== undefined && wordArray[0] !== '')
           {
             commandKnown = true;
-            parsedOut += '  // ' + wordArray.join(' ') + '\n';
+            parsedOut += '    // ' + wordArray.join(' ') + '\n';
           } else {
             error('Error: at line: ' + (i + 1) + ', REM needs a comment');
             return;
@@ -291,7 +295,7 @@ class Duckuino {
           if (wordArray[0] != undefined && wordArray[0] != ''){
             commandKnown = true;
             var mouseParams = wordArray[0].split(',');
-            parsedOut += '  AbsoluteMouse.move('+mouseParams[0]+', '+mouseParams[1];
+            parsedOut += '    AbsoluteMouse.move('+mouseParams[0]+', '+mouseParams[1];
 
             if(mouseParams[2] != undefined && mouseParams[2] != ''){
               parsedOut += ', '+mouseParams[2];
@@ -310,7 +314,7 @@ class Duckuino {
 
           if (wordArray[0] == 'LEFT' || wordArray[0] == 'RIGHT' || wordArray[0] == 'MIDDLE' && wordArray[0] != undefined && wordArray[0] != ''){
             commandKnown = true;
-            parsedOut += '  AbsoluteMouse.click(MOUSE_'+wordArray[0]+');\n'
+            parsedOut += ' AbsoluteMouse.click(MOUSE_'+wordArray[0]+');\n'
             wordArray.shift();
           } else {
             error('Error: at line: ' + (i + 1) + ', MOUSECLICK requires key (left/middle/right)')
@@ -348,9 +352,9 @@ class Duckuino {
             lastLines = lastLines.replace(/^  /gm,'    ');
 
             // Replace them
-            parsedOut += '  for(int i = 0; i < ' + wordArray[0] + '; i++) {\n';
+            parsedOut += '    for(int i = 0; i < ' + wordArray[0] + '; i++) {\n';
             parsedOut += lastLines;
-            parsedOut += '  }\n';
+            parsedOut += '    }\n';
 
             commandKnown = true;
           } else {
@@ -365,11 +369,11 @@ class Duckuino {
             {
               commandKnown = true;
 
-              parsedOut += '  typeKey(' + comboMap[wordArray[0]] + ');\n';
+              parsedOut += '    typeKey(' + comboMap[wordArray[0]] + ');\n';
             }else if (commandMap[wordArray[0]] !== undefined) {
               commandKnown = true;
 
-              parsedOut += '  typeKey(' + commandMap[wordArray[0]] + ');\n';
+              parsedOut += '    typeKey(' + commandMap[wordArray[0]] + ');\n';
             }else {
               commandKnown = false;
               break;
@@ -382,22 +386,22 @@ class Duckuino {
               commandKnown = true;
               releaseAll = true;
 
-              parsedOut += '  Keyboard.press(' + comboMap[wordArray[0]] + ');\n';
+              parsedOut += '    Keyboard.press(' + comboMap[wordArray[0]] + ');\n';
             }else if (commandMap[wordArray[0]] !== undefined) {
               commandKnown = true;
               releaseAll = true;
 
-              parsedOut += '  Keyboard.press(' + commandMap[wordArray[0]] + ');\n';
+              parsedOut += '    Keyboard.press(' + commandMap[wordArray[0]] + ');\n';
             }else if (keyMap[wordArray[0]] !== undefined) {
               commandKnown = true;
               releaseAll = true;
 
-              parsedOut += '  Keyboard.press(' + keyMap[wordArray[0]] + ');\n';
+              parsedOut += '    Keyboard.press(' + keyMap[wordArray[0]] + ');\n';
             }else if (numpadMap[wordArray[0]] !== undefined){
 			  commandKnown = true;
               releaseAll = true;
 
-              parsedOut += '  typeKey(' + numpadMap[wordArray[0]] + ');\n';
+              parsedOut += '    typeKey(' + numpadMap[wordArray[0]] + ');\n';
 			}else {
               commandKnown = false;
               break;
@@ -414,11 +418,11 @@ class Duckuino {
 
       // If we need to release keys, we do
       if (releaseAll)
-        parsedOut += '  Keyboard.releaseAll();\n';
+        parsedOut += '    Keyboard.releaseAll();\n';
 
       parsedScript += parsedOut; // Add what we parsed
       if (i != (lineArray.length - 1))
-        parsedScript += '\n  delay(defaultDelay);\n'; // Add new line if not the last line
+        parsedScript += '\n    delay(defaultDelay);\n'; // Add new line if not the last line
     }
 
     var timerEnd = Date.now();

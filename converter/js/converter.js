@@ -7,6 +7,17 @@ var arduinoCode = "";
 var duckuino = new Duckuino();
 var compilerMsg = "";
 
+var lang = "de_DE";
+var name = "test";
+var url = "/hackstuff/malduino/converter/src";
+
+var keyboardCPPbegin = "";
+var keyboardCPPend = "";
+var keyboardCPP = "";
+var keyboardH = "";
+var langFile = "";
+var eliteFirmware = "";
+
 function autocorrect(str){
 	str = str.replace(new RegExp("STRING", 'ig'),"STRING");
 	str = str.replace(new RegExp("REM", 'ig'),"REM");
@@ -57,7 +68,6 @@ function convertAltCodes(str){
 	if(lines !== null){
 		for(var i=0;i<lines.length;i++){
 			var curLine = lines[i];
-			console.log(curLine);
 			for(var j=0;j<specialChars.length;j++){
 				curLine = curLine.replace(new RegExp(specialChars[j][0], "g"),"\n"+getAltCode(j)+"\nSTRING"+" ");
 			}
@@ -125,29 +135,65 @@ function convert(){
 	if($('#delay').prop('checked')) script = addDelay(script);
 	if($('#autoCorrect').prop('checked')) script = autocorrect(script);
 	
+	if(script.slice(-1) == '\n') script = script.slice(0,-1);
+	
 	duckyScript = script;
 	arduinoCode = duckuino.compile(duckyScript);
 	
 	if(useLite) $('#output').val(arduinoCode);
 	else $('#output').val(duckyScript);
-}
+
+	$.ajax({url: url+"/Keyboard_begin.cpp", success: function(result){
+		keyboardCPPbegin = result;
 		
-function saveData(fileName, data){
-	var a = document.createElement("a");
-	document.body.appendChild(a);
-	a.style = "display: none";
-	
-	var blob = new Blob([data], {type: "octet/stream"});
-	var url = window.URL.createObjectURL(blob);
-	a.href = url;
-	a.download = fileName;
-	a.click();
-	window.URL.revokeObjectURL(url);
-}
+		$.ajax({url: url+"/Keyboard_end.cpp", success: function(result){
+			keyboardCPPend = result;
+			
+			$.ajax({url: url+"/locales/"+lang+".lang", success: function(result){
+				langFile = result;
+				keyboardCPP = keyboardCPPbegin + langFile + keyboardCPPend;
+				
+				$.ajax({url: url+"/Keyboard.h", success: function(result){
+					keyboardH = result;
+					
+					$.ajax({url: url+"/elite.ino", success: function(result){
+						eliteFirmware = result;
+						
+						var zip = new JSZip();
+						var eliteFolder = zip.folder("elite");
+						var liteFolder = zip.folder("lite");
+						eliteFolder.file("elite.ino", eliteFirmware);
+						eliteFolder.file(name+".txt", duckyScript);
+						eliteFolder.file("Keyboard.h", keyboardH);
+						eliteFolder.file("Keyboard.cpp", keyboardCPP);
+						liteFolder.file("lite.ino", arduinoCode);
+						liteFolder.file("Keyboard.h", keyboardH);
+						liteFolder.file("Keyboard.cpp", keyboardCPP);
+						zip.generateAsync({type:"blob"}).then(function(content) {
+							saveAs(content, name+".zip");
+						});
+						
+						
+					},error: function(xhr,status,error){
+						console.error("error loading '"+this.url+"' ( "+status+" "+error+")");
+					}});
+					
+					
+				},error: function(xhr,status,error){
+					console.error("error loading '"+this.url+"' ( "+status+" "+error+")");
+				}});
+				
+			},error: function(xhr,status,error){
+				console.error("error loading '"+this.url+"' ( "+status+" "+error+")");
+			}});
+			
+		},error: function(xhr,status,error){
+			console.error("error loading '"+this.url+"' ("+status+" "+error+")");
+		}});
 		
-function download(){
-	var duckuino = new Duckuino();
-	saveData("test123.txt", duckuino.compile("GUI r\nSTRING Hello World"));
+	},error: function(xhr,status,error){
+		console.error("error loading '"+this.url+"' ( "+status+" "+error+")");
+	}});
 }
 
 function openSettings(){
@@ -180,7 +226,7 @@ function error(msg){
 }
 
 $(document).ready(function(){
-	changeModel(!window.location.href.includes("?m=elite"));
+	
 });
 
 
