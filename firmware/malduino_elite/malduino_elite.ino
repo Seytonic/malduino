@@ -1,6 +1,6 @@
 #include <SPI.h>
 #include <SD.h>
-#include <Keyboard.h>
+#include "Keyboard.h"
 
 //#define debug true // <-- uncomment to turn serial output on
 #define CSpin 4 //Chip-Select of the SD-Card reader
