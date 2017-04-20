@@ -11,6 +11,30 @@
 	margin-bottom: 1rem;
 	padding: 1rem;
 }
+#modelSelection{
+	margin-bottom: 1rem;
+}
+.modelOption{
+	width: 50%;
+	float: left;
+	background: #323232;
+	text-align: center;
+	font-size: 2rem;
+	color: #fff;
+	border-bottom: 3px solid #323232;
+	border-top: 3px solid #323232;
+	cursor: pointer;
+}
+.modelOption:hover,
+.modelOption.selected{
+	background: #1EAEDB;
+	border-bottom: 3px solid #A40001;
+	border-top: 3px solid #1EAEDB;
+}
+.modelOption:hover a,
+.modelOption.selected a{
+	color: #fff;
+}
 
 
 textarea{

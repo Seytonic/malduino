@@ -34,6 +34,25 @@ var commandMap = {
   F12:'KEY_F12'
 };
 
+var numpadMap = {
+  NUM_0:'234',
+  NUM_1:'225',
+  NUM_2:'226',
+  NUM_3:'227',
+  NUM_4:'228',
+  NUM_5:'229',
+  NUM_6:'230',
+  NUM_7:'231',
+  NUM_8:'232',
+  NUM_9:'233',
+  NUM_ASTERIX:'221',
+  NUM_ENTER:'224',
+  NUM_MINUS:'222',
+  NUM_PERIOD:'235',
+  NUM_PLUS:'223',
+  NUM_SLASH:'220'
+}
+
 var comboMap = {
   ALT:'KEY_LEFT_ALT',
   GUI:'KEY_LEFT_GUI',
@@ -95,29 +114,26 @@ class Duckuino {
     } 
 
     // Build the Arduino code skeleton
-    return '#include <HID-Project.h>\n'
-    + '#include <HID-Settings.h>\n\n'
-    + '// Utility function\n'
+    return '#include <Keyboard.h>\n'
+	+ '\n'
+	+ 'int defaultDelay = 5;\n'
+	+ 'int defaultCharDelay = 5;\n'
+    + '\n'
     + 'void typeKey(int key){\n'
     + '  Keyboard.press(key);\n'
-    + '  delay(50);\n'
+    + '  delay(defaultCharDelay);\n'
     + '  Keyboard.release(key);\n'
-    + '}\n\n'
-    + 'void setup()\n'
-    + '{\n'
-    + '  // Start Keyboard and Mouse\n'
-    + '  AbsoluteMouse.begin();\n'
-    + '  Keyboard.begin();\n\n'
-    + '  // Start Payload\n'
-    + parsedDucky
-    + '\n'
-    + '  // End Payload\n\n'
-    + '  // Stop Keyboard and Mouse\n'
-    + '  Keyboard.end();\n'
-    + '  AbsoluteMouse.end();\n'
     + '}\n'
     + '\n'
-    + '// Unused\n'
+    + 'void setup(){\n'
+    + '  \n'
+    + '  Keyboard.begin();\n'
+    + '  \n'
+    + parsedDucky
+    + '  \n'
+    + '  Keyboard.end();\n'
+    + '}\n'
+    + '\n'
     + 'void loop() {}';
   }
 
@@ -194,6 +210,42 @@ class Duckuino {
             commandKnown = true;
           } else {
             console.error('Error: at line: ' + (i + 1) + ', DELAY only acceptes numbers');
+            return;
+          }
+          break;
+		case "DEFAULTDELAY":
+		case "DEFAULT_DELAY":
+          wordArray.shift();
+
+          if(wordArray[0] === undefined || wordArray[0] === '') {
+            console.error('Error: at line: ' + (i + 1) + ', DEFAULTDELAY needs a time');
+            return;
+          }
+
+          if (! isNaN(wordArray[0]))
+          {
+            parsedOut += '  defaultDelay = ' + wordArray[0] + ';\n';
+            commandKnown = true;
+          } else {
+            console.error('Error: at line: ' + (i + 1) + ', DEFAULTDELAY only acceptes numbers');
+            return;
+          }
+          break;
+		case "DEFAULTCHARDELAY":
+		case "DEFAULT_CHAR_DELAY":
+          wordArray.shift();
+
+          if(wordArray[0] === undefined || wordArray[0] === '') {
+            console.error('Error: at line: ' + (i + 1) + ', DEFAULTCHARDELAY needs a time');
+            return;
+          }
+
+          if (! isNaN(wordArray[0]))
+          {
+            parsedOut += '  defaultCharDelay = ' + wordArray[0] + ';\n';
+            commandKnown = true;
+          } else {
+            console.error('Error: at line: ' + (i + 1) + ', DEFAULTCHARDELAY only acceptes numbers');
             return;
           }
           break;
@@ -335,7 +387,12 @@ class Duckuino {
               releaseAll = true;
 
               parsedOut += '  Keyboard.press(' + keyMap[wordArray[0]] + ');\n';
-            }else {
+            }else if (numpadMap[wordArray[0]] !== undefined){
+			  commandKnown = true;
+              releaseAll = true;
+
+              parsedOut += '  typeKey(' + numpadMap[wordArray[0]] + ');\n';
+			}else {
               commandKnown = false;
               break;
             }
@@ -355,7 +412,7 @@ class Duckuino {
 
       parsedScript += parsedOut; // Add what we parsed
       if (i != (lineArray.length - 1))
-        parsedScript += '\n'; // Add new line if not the last line
+        parsedScript += '\n  delay(defaultDelay);\n'; // Add new line if not the last line
     }
 
     var timerEnd = Date.now();

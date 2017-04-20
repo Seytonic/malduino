@@ -1,6 +1,6 @@
 #include <SPI.h>
 #include <SD.h>
-#include "Keyboard.h"
+#include <Keyboard.h>
 
 //#define debug true // <-- uncomment to turn serial output on
 #define CSpin 4 //Chip-Select of the SD-Card reader
@@ -29,6 +29,7 @@
 #define KEYPAD_PERIOD 235
 #define KEYPAD_PLUS 223
 #define KEYPAD_SLASH 220
+#define PRINTSCREEN 206
 
 File payload;
 char last[buffersize];
@@ -79,7 +80,7 @@ void runLine(){
     else if(equals(0,space,"DELAY")) delay(getInt(space));
     else if(equals(0,space,"STRING")){
       for(int i=space+1;i<bufSize;i++) KeyboardWrite(buf[i]);
-    }else if(equals(0,space,"REPEAT")){
+    }else if(equals(0,space,"REPEAT") || equals(0,space,"REPLAY")){
       int runs = getInt(space);
       strncpy(buf, last, lastSize);
       bufSize = lastSize;
@@ -129,6 +130,7 @@ void runCommand(int s, int e){
   else if(equals(s,e,"DOWN")) Keyboard.press(KEY_DOWN_ARROW);
   else if(equals(s,e,"LEFT")) Keyboard.press(KEY_LEFT_ARROW);
   else if(equals(s,e,"RIGHT")) Keyboard.press(KEY_RIGHT_ARROW);
+  else if(equals(s,e,"PRINTSCREEN")) Keyboard.press(PRINTSCREEN);
 
   else if(equals(s,e,"F1")) Keyboard.press(KEY_F1);
   else if(equals(s,e,"F2")) Keyboard.press(KEY_F2);
@@ -165,7 +167,6 @@ void runCommand(int s, int e){
   //else if(equals(s,e,"MENU")) Keyboard.press();
   //else if(equals(s,e,"BREAK") || equals(s,e,"PAUSE")) Keyboard.press();
   //else if(equals(s,e,"NUMLOCK")) Keyboard.press();
-  //else if(equals(s,e,"PRINTSCREEN")) Keyboard.press();
   //else if(equals(s,e,"SCROLLLOCK")) Keyboard.press();
 }
 
