@@ -102,31 +102,6 @@
 								<button onclick="convertToStrings()">convert into string</button>
 							</div>
 						</div>
-						
-						<!--
-						<div class="twelve columns">
-							<div class="one-half column">
-								<label for="keyboardLayout">Keyboard Layout + Firmware</label>
-							</div>
-							<div class="one-half column">
-								<select id="keyboardLayout" name="keyboardLayout">
-									<option value="be_BE">be_BE</option>
-									<option value="cz_CZ">cz_CZ</option>
-									<option value="da_DK">da_DK</option>
-									<option value="de_DE">de_DE</option>
-									<option value="en_US">en_US</option>
-									<option value="es_ES">es_ES</option>
-									<option value="fi_FI">fi_FI</option>
-									<option value="fr_FR">fr_FR</option>
-									<option value="it_IT">it_IT</option>
-									<option value="pt_PT">pt_PT</option>
-									<option value="tr_TR">tr_TR</option>
-								</select> 
-								<a class="button button-primary">LITE</a>
-								<a class="button button-primary">ELITE</a>
-							</div>
-						</div>
-						-->
 				</div>
 			</div>
 
@@ -144,7 +119,34 @@
 			</div>
 			
 			<div class="row">
-				<button class="button-primary" id="downloadBtn">Download</button>
+				<div class="twelve columns">
+					<div class="one-half column">
+						<label>Keyboard Layout:
+							<select id="keyboardLayout" name="keyboardLayout">
+								<option value="be_BE">be_BE</option>
+								<option value="cz_CZ">cz_CZ</option>
+								<option value="da_DK">da_DK</option>
+								<option value="de_DE">de_DE</option>
+								<option value="en_US">en_US</option>
+								<option value="es_ES">es_ES</option>
+								<option value="fi_FI">fi_FI</option>
+								<option value="fr_FR">fr_FR</option>
+								<option value="it_IT">it_IT</option>
+								<option value="pt_PT">pt_PT</option>
+								<option value="tr_TR">tr_TR</option>
+							</select>
+						</label>
+					</div>
+					<div class="one-half column">
+						<label>Name:
+							<input type="text" placeholder="example" id="scriptName" />
+						</label>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row">
+				<button class="button-primary" id="downloadBtn" onclick="converter.download()">Download</button>
 			</div>
 		</div>
 	</body>

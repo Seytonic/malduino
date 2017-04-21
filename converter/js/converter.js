@@ -9,8 +9,8 @@ var compilerMsg = "";
 var maxlen = 256 - 7;
 var converter;
 
-var lang = "de_DE";
-var name = "test";
+var lang;
+var name;
 var url = "/hackstuff/malduino/converter/src";
 
 var keyboardCPPbegin = "";
@@ -19,6 +19,8 @@ var keyboardCPP = "";
 var keyboardH = "";
 var langFile = "";
 var eliteFirmware = "";
+
+var loaded = 0;
 
 function openSettings(){
 	if(!settingsOn) $('#settings').show('normal');
@@ -45,7 +47,7 @@ function log(msg){
 	$("#compilerMsg").html(msg);
 }
 
-function error(msg){
+function _error(msg){
 	$("#compilerMsg").html("<span class='red'>"+msg+"</span>");
 }
 
@@ -204,59 +206,77 @@ class malduinoScriptConverter{
 		if(useLite) $('#output').val(arduinoCode);
 		else $('#output').val(duckyScript);
 		
-		/*
-		$.ajax({url: url+"/Keyboard_begin.cpp", success: function(result){
-			keyboardCPPbegin = result;
-			
-			$.ajax({url: url+"/Keyboard_end.cpp", success: function(result){
-				keyboardCPPend = result;
+	}
+	
+	download(){
+		if(loaded == 5) createDownload();
+		else{
+			$.ajax({url: url+"/Keyboard_begin.cpp", success: function(result){
+				keyboardCPPbegin = result;
+				loaded++;
 				
-				$.ajax({url: url+"/locales/"+lang+".lang", success: function(result){
-					langFile = result;
-					keyboardCPP = keyboardCPPbegin + langFile + keyboardCPPend;
+				$.ajax({url: url+"/Keyboard_end.cpp", success: function(result){
+					keyboardCPPend = result;
+					loaded++;
 					
-					$.ajax({url: url+"/Keyboard.h", success: function(result){
-						keyboardH = result;
+					$.ajax({url: url+"/locales/"+lang+".lang", success: function(result){
+						langFile = result;
+						keyboardCPP = keyboardCPPbegin + langFile + keyboardCPPend;
+						loaded++;
 						
-						$.ajax({url: url+"/elite.ino", success: function(result){
-							eliteFirmware = result;
+						$.ajax({url: url+"/Keyboard.h", success: function(result){
+							keyboardH = result;
+							loaded++;
 							
-							var zip = new JSZip();
-							var eliteFolder = zip.folder("elite");
-							var liteFolder = zip.folder("lite");
-							eliteFolder.file("elite.ino", eliteFirmware);
-							eliteFolder.file(name+".txt", duckyScript);
-							eliteFolder.file("Keyboard.h", keyboardH);
-							eliteFolder.file("Keyboard.cpp", keyboardCPP);
-							liteFolder.file("lite.ino", arduinoCode);
-							liteFolder.file("Keyboard.h", keyboardH);
-							liteFolder.file("Keyboard.cpp", keyboardCPP);
-							zip.generateAsync({type:"blob"}).then(function(content) {
-								saveAs(content, name+".zip");
-							});
+							$.ajax({url: url+"/elite.ino", success: function(result){
+								eliteFirmware = result;
+								loaded++;
+								
+								createDownload();
+								
+								
+							},error: function(xhr,status,error){
+								_error("error loading '"+this.url+"' ( "+status+" "+error+")");
+							}});
 							
 							
 						},error: function(xhr,status,error){
-							console.error("error loading '"+this.url+"' ( "+status+" "+error+")");
+							_error("error loading '"+this.url+"' ( "+status+" "+error+")");
 						}});
 						
-						
 					},error: function(xhr,status,error){
-						console.error("error loading '"+this.url+"' ( "+status+" "+error+")");
+						_error("error loading '"+this.url+"' ( "+status+" "+error+")");
 					}});
 					
 				},error: function(xhr,status,error){
-					console.error("error loading '"+this.url+"' ( "+status+" "+error+")");
+					_error("error loading '"+this.url+"' ("+status+" "+error+")");
 				}});
 				
 			},error: function(xhr,status,error){
-				console.error("error loading '"+this.url+"' ("+status+" "+error+")");
+				_error("error loading '"+this.url+"' ( "+status+" "+error+")");
 			}});
-			
-		},error: function(xhr,status,error){
-			console.error("error loading '"+this.url+"' ( "+status+" "+error+")");
-		}});
-		*/
+		}
 	}
-	
+}
+
+function createDownload(){
+	if(!$("#compilerMsg").val().includes("error")&&!$("#compilerMsg").val().includes("Error")){
+		lang = $("#keyboardLayout").val();
+		if($("#scriptName").val().trim().length > 0) name = $("#scriptName").val().trim();
+		else name = "example";
+		
+		var zip = new JSZip();
+		var eliteFolder = zip.folder("elite");
+		var liteFolder = zip.folder("lite");
+		eliteFolder.file("elite.ino", eliteFirmware);
+		eliteFolder.file(name+".txt", duckyScript);
+		eliteFolder.file("Keyboard.h", keyboardH);
+		eliteFolder.file("Keyboard.cpp", keyboardCPP);
+		liteFolder.file("lite.ino", arduinoCode);
+		liteFolder.file("Keyboard.h", keyboardH);
+		liteFolder.file("Keyboard.cpp", keyboardCPP);
+		zip.generateAsync({type:"blob"}).then(function(content) {
+			saveAs(content, name+".zip");
+		});
+	}
 }
