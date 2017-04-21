@@ -46,8 +46,8 @@ int getSpace(int start, int end){
   return -1;
 }
 
-bool equals(int start, int end, String str){
-  int len = str.length();
+bool equals(int start, int end, char* str){
+  int len = sizeof(str);
   if(end-start != len) return false;
   for(int i=0;i<len;i++){
     if(buf[start+i] != str[i]) return false;
@@ -155,12 +155,13 @@ void runCommand(int s, int e){
   else if(equals(s,e,"NUM_7")) KeyboardWrite(KEYPAD_7);
   else if(equals(s,e,"NUM_8")) KeyboardWrite(KEYPAD_8);
   else if(equals(s,e,"NUM_9")) KeyboardWrite(KEYPAD_9);
+  /*
   else if(equals(s,e,"NUM_ASTERIX")) KeyboardWrite(KEYPAD_ASTERIX);
   else if(equals(s,e,"NUM_ENTER")) KeyboardWrite(KEYPAD_ENTER);
   else if(equals(s,e,"NUM_Minus")) KeyboardWrite(KEYPAD_MINUS);
   else if(equals(s,e,"NUM_PERIOD")) KeyboardWrite(KEYPAD_PERIOD);
   else if(equals(s,e,"NUM_PLUS")) KeyboardWrite(KEYPAD_PLUS);
-  else if(equals(s,e,"NUM_SLASH")) KeyboardWrite(KEYPAD_SLASH);
+  else if(equals(s,e,"NUM_SLASH")) KeyboardWrite(KEYPAD_SLASH);*/
   
   //not implemented
   //else if(equals(s,e,"APP")) Keyboard.press();

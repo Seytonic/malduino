@@ -2,14 +2,14 @@
 #include <SD.h>
 #include "Keyboard.h"
 
-//#define debug true // <-- uncomment to turn serial output on
+#define debug true // <-- uncomment to turn serial output on
 #define CSpin 4 //Chip-Select of the SD-Card reader
 
 //Dip-Switch Pins:
 #define dip1 6
-#define dip2 7
-#define dip3 8
-#define dip4 9
+#define dip2 8
+#define dip3 9
+#define dip4 10
 
 #define buffersize 256
 
@@ -46,12 +46,30 @@ int getSpace(int start, int end){
   return -1;
 }
 
-bool equals(int start, int end, char* str){
+bool equals(int start, int end, String str){
   int len = sizeof(str);
-  if(end-start != len) return false;
+  #ifdef debug 
+      Serial.print("'");
+      for(int i=0;i<len;i++) Serial.print(buf[start+i],HEX);
+      Serial.print("' == '"+str+"'");
+  #endif
+  /*if(end-start != len){
+    #ifdef debug 
+      Serial.println(": false");
+    #endif
+    return false;
+  }*/
   for(int i=0;i<len;i++){
-    if(buf[start+i] != str[i]) return false;
+    if(buf[start+i] != str[i] && buf[start+i] != ' '){
+      #ifdef debug 
+        Serial.println(": false");
+      #endif
+      return false;
+    }
   }
+  #ifdef debug 
+    Serial.println(": true");
+  #endif
   return true;
 }
 
@@ -91,7 +109,7 @@ void runLine(){
     else if(equals(0,space,"REM")){}
     else{
       runCommand(0,space);
-      while(space >= 0 && space < bufSize){
+      while(space > 0 && space < bufSize){
         int nSpace = getSpace(space+1,bufSize);
         if(nSpace == -1) nSpace = bufSize;
         runCommand(space+1,nSpace);
@@ -211,7 +229,11 @@ void setup() {
 
       buf[bufSize] = payload.read();
       if(buf[bufSize] == '\r' || buf[bufSize] == '\n' || bufSize >= buffersize){
-        if(buf[bufSize] == '\r' && payload.peek() == '\n') payload.read();
+        if(buf[bufSize] == 0x20 && (payload.peek() == '\r' || payload.peek() == '\n')){ 
+          payload.read();
+          if(payload.peek() == '\n') payload.read();
+        }
+        else if(buf[bufSize] == '\r' && payload.peek() == '\n') payload.read();
         runLine();
         strncpy(last, buf, bufSize);
         lastSize = bufSize;

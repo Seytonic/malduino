@@ -1,9 +1,0 @@
-The directory where are the locales, usualy the _asciimap array, modified for each locale.
-
-
----Note for the german layout---
-The following character can't be typed:
-"ß´üöä°§ÜÖÄ²³€µ"
-If you try to type these you get this result: ('"' can be typed)
-"t ä´z  qk   2 "
-As you see you get the wrong character. Spaces mean you get nothing or the script crashes.
