@@ -98,7 +98,7 @@ void runLine(){
       }
     }
   }
-  
+
   Keyboard.releaseAll();
   delay(defaultDelay);
 }
@@ -109,7 +109,7 @@ void runCommand(int s, int e){
     Serial.println("Press '"+String(buf).substring(s,e)+"'");
   #endif
   
-  if(s == e) Keyboard.press(buf[s]);
+  if(e - s < 2) Keyboard.press(buf[s]);
   else if(equals(s,e,"ENTER",5)) Keyboard.press(KEY_RETURN);
   else if(equals(s,e,"GUI",3) || equals(s,e,"WINDOWS",5)) Keyboard.press(KEY_LEFT_GUI);
   else if(equals(s,e,"SHIFT",5)) Keyboard.press(KEY_LEFT_SHIFT);
@@ -129,6 +129,7 @@ void runCommand(int s, int e){
   else if(equals(s,e,"DOWN",4)) Keyboard.press(KEY_DOWN_ARROW);
   else if(equals(s,e,"LEFT",4)) Keyboard.press(KEY_LEFT_ARROW);
   else if(equals(s,e,"RIGHT",5)) Keyboard.press(KEY_RIGHT_ARROW);
+  else if(equals(s,e,"PRINTSCREEN",11)) Keyboard.press(PRINTSCREEN);
 
   else if(equals(s,e,"F1",3)) Keyboard.press(KEY_F1);
   else if(equals(s,e,"F2",3)) Keyboard.press(KEY_F2);
@@ -158,7 +159,10 @@ void runCommand(int s, int e){
   else if(equals(s,e,"NUM_Minus",9)) KeyboardWrite(KEYPAD_MINUS);
   else if(equals(s,e,"NUM_PERIOD",10)) KeyboardWrite(KEYPAD_PERIOD);
   else if(equals(s,e,"NUM_PLUS",8)) KeyboardWrite(KEYPAD_PLUS);
-  else if(equals(s,e,"PRINTSCREEN",11)) Keyboard.press(PRINTSCREEN);
+
+  #ifdef debug 
+      else Serial.println("failed");
+  #endif
   
   /* not implemented
   else if(equals(s,e,"APP",3)) Keyboard.press();

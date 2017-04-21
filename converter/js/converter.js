@@ -6,6 +6,8 @@ var duckyScript = "";
 var arduinoCode = "";
 var duckuino = new Duckuino();
 var compilerMsg = "";
+var maxlen = 256 - 7;
+var converter;
 
 var lang = "de_DE";
 var name = "test";
@@ -17,184 +19,6 @@ var keyboardCPP = "";
 var keyboardH = "";
 var langFile = "";
 var eliteFirmware = "";
-
-function autocorrect(str){
-	str = str.replace(new RegExp("^(?!REM).*STRING", 'igm'),"STRING");
-	str = str.replace(new RegExp("^(?!STRING).*REM", 'igm'),"REM");
-	str = str.replace(new RegExp("^( )*", 'igm'),"");
-	
-	var regex = new RegExp(/^(?!(STRING|REM) ).*/igm);
-	var lines = str.match(regex);
-	
-	for(var i=0;i<lines.length;i++){
-		var curLine = lines[i];
-		for(var j=0;j<commands.length;j++){
-			curLine = curLine.replace(new RegExp(commands[j], 'ig'),commands[j]);
-		}
-		str = str.replace(new RegExp("^"+lines[i]+"$",'igm'),curLine);
-		
-	}
-	return str;
-}
-
-function deleteComments(str){
-	str = str.replace(new RegExp(/^REM .*/igm),"");
-	return str;
-}
-
-function convertLineBreaks(str){
-	str = str.replace(new RegExp("\r", "g"),"\n");
-	return str;
-}
-
-function deleteBreaks(str){
-	str = str.replace(new RegExp("^( )*\n", 'igm'),"");
-	return str;
-}
-	
-function getAltCode(num){
-	var keyStr = "ALT";
-	var code = ""+specialChars[num][1];
-	for(var i=0;i<code.length;i++){
-		keyStr += " ";
-		keyStr += "NUM_"+code[i];
-	}
-	return keyStr;
-}
-	
-function convertAltCodes(str){
-	var regex = new RegExp(/^STRING .*/igm);
-	var lines = str.match(regex);
-	if(lines !== null){
-		for(var i=0;i<lines.length;i++){
-			var curLine = lines[i];
-			for(var j=0;j<specialChars.length;j++){
-				curLine = curLine.replace(new RegExp(specialChars[j][0], "g"),"\n"+getAltCode(j)+"\nSTRING"+" ");
-			}
-			str = str.replace(lines[i],curLine);
-		}
-	}
-	str += "\n";
-	str = str.replace(new RegExp(/^STRING( )*$/igm),"");
-	return str;
-}
-		
-function optimize(str){
-	var lines = [];
-	var lineNum = 0;
-			
-	var line = "";
-	for(var i=0;i<str.length;i++){
-		var c = str.charAt(i);
-		if(c == "\n"){
-			lines[lineNum] = line;
-			lineNum++;
-			line = "";
-		}
-		else line += c;
-	}
-	
-	for(var i=0;i<lines.length-1;i++){
-		var h = i;
-		var same = (lines[h] == lines[h+1]);
-		var count = 0;
-		while(same && h<lines.length-1 && lines[h+1] != "undefined" && (typeof lines[h+1] !== "undefined")){
-			count++;
-			h++;
-			same = lines[h] == lines[h+1];
-		}
-		if(count > 0){
-			lines[i+1] = "REPEAT "+count;
-			var linesLen = lines.length;
-			var _linesEnd = lines.splice(i+count+1,linesLen);
-			var _linesBegin = lines.splice(0,i+2);
-			lines = _linesBegin.concat(_linesEnd);
-		}
-	}
-
-	str = "";
-	for(var i=0;i<lines.length;i++) str += lines[i]+"\n";
-	
-	return str;
-}
-
-function addDelay(str){
-	var beginStr = str.match(new RegExp(/^(?!(REM) ).*/igm))[0];
-	if(!(new RegExp(/^DELAY /igm)).test(beginStr)) str = "DELAY 1000\n"+str;
-	return str;
-}
-		  
-function convert(){
-	var script = document.getElementById('input').value;
-	script = convertLineBreaks(script);
-	
-	if($('#convertALTCodes').prop('checked')) script = convertAltCodes(script);
-	if($('#deleteComments').prop('checked'))script = deleteComments(script);
-	script = deleteBreaks(script);
-	if($('#optimize').prop('checked')) script = optimize(script);
-	if($('#delay').prop('checked')) script = addDelay(script);
-	if($('#autoCorrect').prop('checked')) script = autocorrect(script);
-	
-	if(script.slice(-1) == '\n') script = script.slice(0,-1);
-	
-	duckyScript = script;
-	arduinoCode = duckuino.compile(duckyScript);
-	
-	if(useLite) $('#output').val(arduinoCode);
-	else $('#output').val(duckyScript);
-
-	$.ajax({url: url+"/Keyboard_begin.cpp", success: function(result){
-		keyboardCPPbegin = result;
-		
-		$.ajax({url: url+"/Keyboard_end.cpp", success: function(result){
-			keyboardCPPend = result;
-			
-			$.ajax({url: url+"/locales/"+lang+".lang", success: function(result){
-				langFile = result;
-				keyboardCPP = keyboardCPPbegin + langFile + keyboardCPPend;
-				
-				$.ajax({url: url+"/Keyboard.h", success: function(result){
-					keyboardH = result;
-					
-					$.ajax({url: url+"/elite.ino", success: function(result){
-						eliteFirmware = result;
-						
-						var zip = new JSZip();
-						var eliteFolder = zip.folder("elite");
-						var liteFolder = zip.folder("lite");
-						eliteFolder.file("elite.ino", eliteFirmware);
-						eliteFolder.file(name+".txt", duckyScript);
-						eliteFolder.file("Keyboard.h", keyboardH);
-						eliteFolder.file("Keyboard.cpp", keyboardCPP);
-						liteFolder.file("lite.ino", arduinoCode);
-						liteFolder.file("Keyboard.h", keyboardH);
-						liteFolder.file("Keyboard.cpp", keyboardCPP);
-						zip.generateAsync({type:"blob"}).then(function(content) {
-							saveAs(content, name+".zip");
-						});
-						
-						
-					},error: function(xhr,status,error){
-						console.error("error loading '"+this.url+"' ( "+status+" "+error+")");
-					}});
-					
-					
-				},error: function(xhr,status,error){
-					console.error("error loading '"+this.url+"' ( "+status+" "+error+")");
-				}});
-				
-			},error: function(xhr,status,error){
-				console.error("error loading '"+this.url+"' ( "+status+" "+error+")");
-			}});
-			
-		},error: function(xhr,status,error){
-			console.error("error loading '"+this.url+"' ("+status+" "+error+")");
-		}});
-		
-	},error: function(xhr,status,error){
-		console.error("error loading '"+this.url+"' ( "+status+" "+error+")");
-	}});
-}
 
 function openSettings(){
 	if(!settingsOn) $('#settings').show('normal');
@@ -225,8 +49,214 @@ function error(msg){
 	$("#compilerMsg").html("<span class='red'>"+msg+"</span>");
 }
 
-$(document).ready(function(){
+function convertToStrings(){
+	var str = $('#input').val();
+	str = str.replace(/\r/gm,"\n");
+	str = str.replace(/\n\n/gm,"\n");
+		
+	str = str.replace(/^(?!(STRING |ENTER))/gm,"STRING ");
+	str = str.replace(/\n/g,"\nENTER\n");
 	
+	var lines = str.split('\n');
+	for(var i=0;i<lines.length;i++){
+		var line = lines[i].substring(7);
+		if(line.length>maxlen){
+			var runs = parseInt(line.length/maxlen);
+			if(line.length%maxlen > 0) runs++;
+				var newline = "";
+				for(var j=0;j<runs;j++){
+					newline += "STRING "+line.substring(j*maxlen, j*maxlen+maxlen)+"\n";
+				}
+				str = str.replace(lines[i],newline);
+			}
+		}	
+	$('#input').val(str);
+}
+
+$(document).ready(function(){
+	converter = new malduinoScriptConverter();
 });
 
+class malduinoScriptConverter{
+	
+	deleteComments(str){
+		str = str.replace(new RegExp(/^REM .*/igm),"");
+		return str;
+	}
 
+	convertLineBreaks(str){
+		str = str.replace(new RegExp("\r", "g"),"\n");
+		return str;
+	}
+
+	deleteBreaks(str){
+		str = str.replace(new RegExp("^( )*\n", 'igm'),"");
+		return str;
+	}
+		
+	getAltCode(num){
+		var keyStr = "ALT";
+		var code = ""+specialChars[num][1];
+		for(var i=0;i<code.length;i++){
+			keyStr += " ";
+			keyStr += "NUM_"+code[i];
+		}
+		return keyStr;
+	}
+		
+	convertAltCodes(str){
+		var regex = new RegExp(/^STRING .*/igm);
+		var lines = str.match(regex);
+		if(lines !== null){
+			for(var i=0;i<lines.length;i++){
+				var curLine = lines[i];
+				for(var j=0;j<specialChars.length;j++){
+					curLine = curLine.replace(new RegExp(specialChars[j][0], "g"),"\n"+this.getAltCode(j)+"\nSTRING"+" ");
+				}
+				str = str.replace(lines[i],curLine);
+			}
+		}
+		str += "\n";
+		str = str.replace(new RegExp(/^STRING( )*$/igm),"");
+		return str;
+	}
+			
+	optimize(str){
+		var lines = [];
+		var lineNum = 0;
+				
+		var line = "";
+		for(var i=0;i<str.length;i++){
+			var c = str.charAt(i);
+			if(c == "\n"){
+				lines[lineNum] = line;
+				lineNum++;
+				line = "";
+			}
+			else line += c;
+		}
+		
+		for(var i=0;i<lines.length-1;i++){
+			var h = i;
+			var same = (lines[h] == lines[h+1]);
+			var count = 0;
+			while(same && h<lines.length-1 && lines[h+1] != "undefined" && (typeof lines[h+1] !== "undefined")){
+				count++;
+				h++;
+				same = lines[h] == lines[h+1];
+			}
+			if(count > 0){
+				lines[i+1] = "REPEAT "+count;
+				var linesLen = lines.length;
+				var _linesEnd = lines.splice(i+count+1,linesLen);
+				var _linesBegin = lines.splice(0,i+2);
+				lines = _linesBegin.concat(_linesEnd);
+			}
+		}
+
+		str = "";
+		for(var i=0;i<lines.length;i++) str += lines[i]+"\n";
+		
+		return str;
+	}
+
+	addDelay(str){
+		var beginStr = str.match(new RegExp(/^(?!(REM) ).*/igm))[0];
+		if(!(new RegExp(/^DELAY /igm)).test(beginStr)) str = "DELAY 1000\n"+str;
+		return str;
+	}
+
+	autocorrect(str){
+		str = str.replace(new RegExp("^(?!REM).*STRING", 'igm'),"STRING");
+		str = str.replace(new RegExp("^(?!STRING).*REM", 'igm'),"REM");
+		str = str.replace(new RegExp("^( )*", 'igm'),"");
+		
+		var regex = new RegExp(/^(?!(STRING|REM) ).*/igm);
+		var lines = str.match(regex);
+		
+		for(var i=0;i<lines.length;i++){
+			var curLine = lines[i];
+			for(var j=0;j<commands.length;j++){
+				curLine = curLine.replace(new RegExp(commands[j], 'ig'),commands[j]);
+			}
+			str = str.replace(new RegExp("^"+lines[i]+"$",'igm'),curLine);
+			
+		}
+		return str;
+	}
+	
+	compile(){
+		var script = $('#input').val();
+		script = this.convertLineBreaks(script);
+		
+		if($('#convertALTCodes').prop('checked')) script = this.convertAltCodes(script);
+		if($('#deleteComments').prop('checked'))script = this.deleteComments(script);
+		script = this.deleteBreaks(script);
+		if($('#optimize').prop('checked')) script = this.optimize(script);
+		if($('#delay').prop('checked')) script = this.addDelay(script);
+		if($('#autoCorrect').prop('checked')) script = this.autocorrect(script);
+		
+		if(script.slice(-1) == '\n') script = script.slice(0,-1);
+		
+		duckyScript = script;
+		arduinoCode = duckuino.compile(duckyScript);
+		
+		if(useLite) $('#output').val(arduinoCode);
+		else $('#output').val(duckyScript);
+		
+		/*
+		$.ajax({url: url+"/Keyboard_begin.cpp", success: function(result){
+			keyboardCPPbegin = result;
+			
+			$.ajax({url: url+"/Keyboard_end.cpp", success: function(result){
+				keyboardCPPend = result;
+				
+				$.ajax({url: url+"/locales/"+lang+".lang", success: function(result){
+					langFile = result;
+					keyboardCPP = keyboardCPPbegin + langFile + keyboardCPPend;
+					
+					$.ajax({url: url+"/Keyboard.h", success: function(result){
+						keyboardH = result;
+						
+						$.ajax({url: url+"/elite.ino", success: function(result){
+							eliteFirmware = result;
+							
+							var zip = new JSZip();
+							var eliteFolder = zip.folder("elite");
+							var liteFolder = zip.folder("lite");
+							eliteFolder.file("elite.ino", eliteFirmware);
+							eliteFolder.file(name+".txt", duckyScript);
+							eliteFolder.file("Keyboard.h", keyboardH);
+							eliteFolder.file("Keyboard.cpp", keyboardCPP);
+							liteFolder.file("lite.ino", arduinoCode);
+							liteFolder.file("Keyboard.h", keyboardH);
+							liteFolder.file("Keyboard.cpp", keyboardCPP);
+							zip.generateAsync({type:"blob"}).then(function(content) {
+								saveAs(content, name+".zip");
+							});
+							
+							
+						},error: function(xhr,status,error){
+							console.error("error loading '"+this.url+"' ( "+status+" "+error+")");
+						}});
+						
+						
+					},error: function(xhr,status,error){
+						console.error("error loading '"+this.url+"' ( "+status+" "+error+")");
+					}});
+					
+				},error: function(xhr,status,error){
+					console.error("error loading '"+this.url+"' ( "+status+" "+error+")");
+				}});
+				
+			},error: function(xhr,status,error){
+				console.error("error loading '"+this.url+"' ("+status+" "+error+")");
+			}});
+			
+		},error: function(xhr,status,error){
+			console.error("error loading '"+this.url+"' ( "+status+" "+error+")");
+		}});
+		*/
+	}
+	
+}

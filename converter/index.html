@@ -41,14 +41,13 @@
 			
 			<div class="row">
 				<div class="twelve columns">
-					<button onclick="openSettings()" class="left">settings</button>
-					<button onclick="convert()" class="right button-primary">convert</button>
+					<button onclick="openSettings()" class="left">extras</button>
+					<button onclick="converter.compile()" class="right button-primary">convert</button>
 				</div>
 			</div>
 			
 			<div class="row">
 				<div class="twelve columns" id="settings">
-					<form>
 						
 						<div class="twelve columns">
 							<div class="one-half column">
@@ -95,6 +94,15 @@
 							</div>
 						</div>
 						
+						<div class="twelve columns">
+							<div class="one-half column">
+								<p class="bold">Input to STRING Commands</p>
+							</div>
+							<div class="one-half column">
+								<button onclick="convertToStrings()">convert into string</button>
+							</div>
+						</div>
+						
 						<!--
 						<div class="twelve columns">
 							<div class="one-half column">
@@ -119,8 +127,6 @@
 							</div>
 						</div>
 						-->
-						
-					</form>
 				</div>
 			</div>
 
