@@ -1,0 +1,86 @@
+<!Doctype html>
+<html>
+	<head>
+		<title>MalDuino Converter</title>
+		<meta charset="utf-8">
+		<meta name="description" content="Use this converter to get your Ducky Scripts ready for the MalDuino Lite and Elite.">
+		<meta name="author" content="Seytonic">
+  
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		
+		<link rel="stylesheet" href="css/normalize.css">
+		<link rel="stylesheet" href="css/skeleton.css">
+		<link rel="stylesheet" href="css/style.css">
+		
+		<link rel="icon" type="image/png" href="images/favicon.png">
+		
+		<script src="js/jquery-3.2.1.min.js"></script>
+		
+		<script>
+			var maxlen = 256 - 7;
+			
+			function convert(){
+				var str = $('#input').val();
+				
+				str = str.replace(/\r/gm,"\n");
+				str = str.replace(/\n\n/gm,"\n");
+				
+				str = str.replace(/^/gm,"STRING ");
+				str = str.replace(/\n/gm,"\nENTER\n");
+				
+				var lines = str.split('\n');
+				for(var i=0;i<lines.length;i++){
+					var line = lines[i].substring(7);
+					console.log(line);
+					console.log(line.length);
+					if(line.length>maxlen){
+						console.warn("overflow");
+						var runs = parseInt(line.length/maxlen);
+						if(line.length%maxlen > 0) runs++;
+						console.log("runs: "+runs);
+						var newline = "";
+						for(var j=0;j<runs;j++){
+							newline += "STRING "+line.substring(j*maxlen, j*maxlen+maxlen)+"\n";
+						}
+						console.log(line);
+						str = str.replace(lines[i],newline);
+					}
+				}
+				
+				$('#output').val(str);
+				
+			}
+		</script>
+		
+	</head>
+	<body>
+		<div id="header">
+			<h1><span class="red">Mal</span>Duino</h1>
+		</div>
+		
+		<div class="container">
+			
+			<div class="row">
+				<div class="six columns">
+					<p>String</p>
+				</div>
+				<div class="six columns">
+					<p>Ducky Script</p>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="one-half column">
+					<textarea id="input"></textarea>
+				</div>
+				<div class="one-half column">
+					<textarea id="output"></textarea><br />
+				</div>
+			</div>
+			
+			<div class="row">
+				<button class="button-primary" onclick="convert()">Convert</button>
+			</div>
+		</div>
+	</body>
+</html>
