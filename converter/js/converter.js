@@ -19,8 +19,8 @@ var langFile = "";
 var eliteFirmware = "";
 
 function autocorrect(str){
-	str = str.replace(new RegExp("STRING", 'ig'),"STRING");
-	str = str.replace(new RegExp("REM", 'ig'),"REM");
+	str = str.replace(new RegExp("^(?!REM).*STRING", 'igm'),"STRING");
+	str = str.replace(new RegExp("^(?!STRING).*REM", 'igm'),"REM");
 	str = str.replace(new RegExp("^( )*", 'igm'),"");
 	
 	var regex = new RegExp(/^(?!(STRING|REM) ).*/igm);
