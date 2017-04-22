@@ -39,9 +39,9 @@ For more information see: github.com/seytonic/malduino
 #define PRINTSCREEN 206 
 
 File payload;
-char last[buffersize];
+char* last = malloc(sizeof(char)*buffersize);
 int lastSize = 0;
-char buf[buffersize];
+char* buf = malloc(sizeof(char)*buffersize);
 int bufSize = 0;
 int defaultDelay = 5;
 int defaultCharDelay = 5;
