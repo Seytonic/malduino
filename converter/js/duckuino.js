@@ -138,10 +138,12 @@ class Duckuino {
     } 
 
     // Build the Arduino code skeleton
-    return '/*\nCopyright (c) 2017 Seytonic, Spacehuhn (Licensed unter MIT)\n'
+    return '/*\nCopyright (c) 2017 Seytonic, Spacehuhn (Licensed under MIT)\n'
 	+ 'For more information see: github.com/seytonic/malduino\n'
 	+ '*/\n'
 	+ '\n'
+	+ '#include "Keyboard.h"\n'
+	+ '#\n'
 	+ '#define blinkInterval 50\n'
 	+ '#define ledPin 3\n'
 	+ '#define buttonPin 6\n'
@@ -169,7 +171,7 @@ class Duckuino {
     + '    \n'
     + '    /* ----- Begin-Script -----*/\n'
     + '    \n'
-    + '    /*[Parsed By Duckuino (Licensed unter MIT) - for more information visit: https://github.com/Nurrl/Dckuino.js]*/'
+    + '    /* [Parsed By Duckuino (Licensed under MIT) - for more information visit: https://github.com/Nurrl/Dckuino.js] */'
     + '    \n'
     + parsedDucky
     + '    \n'
