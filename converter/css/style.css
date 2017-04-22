@@ -1,12 +1,15 @@
-html {
-  overflow-y: scroll;
-}
-
 #header{
-	width: 100%;
 	background: #323232;
 	color: #0974F6;
 	padding-left: 1rem;
+}
+#infoLink{
+	color: #fff;
+	float: right;
+	margin-right: 1rem;
+	text-decoration: none;
+	font-size: 0.7em;
+	padding-top: 0.25em;
 }
 #settings{
 	display: none;
@@ -64,9 +67,6 @@ textarea{
 	width: 100%;
 	height: 50rem;
 	position: relative;
-
-  overflow-wrap: normal;
-  overflow-x: scroll;
 }
 
 .red{

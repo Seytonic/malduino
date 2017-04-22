@@ -1,3 +1,8 @@
+/*
+Copyright (c) 2017 Seytonic, Spacehuhn (Licensed unter MIT)
+For more information see: github.com/seytonic/malduino
+*/
+
 #include "Keyboard.h"
 
 #define blinkInterval 50

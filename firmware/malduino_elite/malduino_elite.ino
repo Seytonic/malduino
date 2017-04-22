@@ -1,3 +1,8 @@
+/*
+Copyright (c) 2017 Seytonic, Spacehuhn (Licensed unter MIT)
+For more information see: github.com/seytonic/malduino
+*/
+
 #include <SPI.h>
 #include <SD.h>
 #include "Keyboard.h"
