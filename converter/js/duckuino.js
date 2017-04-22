@@ -116,10 +116,14 @@ class Duckuino {
     // Build the Arduino code skeleton
     return '#include "Keyboard.h"\n'
 	+ '\n'
-	+ '#define buttonPin 6'
+	+ '#define blinkInterval 50\n'
+	+ '#define ledPin 3\n'
+	+ '#define buttonPin 6\n'
 	+ '\n'
 	+ 'int defaultDelay = 4;\n'
 	+ 'int defaultCharDelay = 5;\n'
+	+ '\n'
+	+ 'bool ledOn = true;\n'
     + '\n'
     + 'void typeKey(int key){\n'
     + '  Keyboard.press(key);\n'
@@ -130,6 +134,9 @@ class Duckuino {
     + 'void setup(){\n'
     + '  \n'
     + '  pinMode(buttonPin, INPUT_PULLUP);\n'
+	+ '  pinMode(ledPin, OUTPUT);\n'
+	+ '  digitalWrite(ledPin, HIGH);\n'
+	+ '  \n'
     + '  if(digitalRead(buttonPin) == LOW){\n'
     + '    \n'
     + '    Keyboard.begin();\n'
@@ -144,7 +151,11 @@ class Duckuino {
     + '  }\n'
     + '}\n'
     + '\n'
-    + 'void loop() {}';
+    + 'void loop(){\n'
+    + '  ledOn = !ledOn;\n'
+    + '  digitalWrite(ledPin, ledOn);\n'
+    + '  delay(blinkInterval);\n'
+    + '}';
   }
 
   // The parsing function

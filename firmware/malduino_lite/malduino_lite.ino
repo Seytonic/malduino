@@ -1,8 +1,12 @@
 #include "Keyboard.h"
 
+#define blinkInterval 50
+#define ledPin 3
 #define buttonPin 6
+
 int defaultDelay = 4;
 int defaultCharDelay = 5;
+bool ledOn = true;
 
 void typeKey(int key){
   Keyboard.press(key);
@@ -13,6 +17,10 @@ void typeKey(int key){
 void setup(){
   
   pinMode(buttonPin, INPUT_PULLUP);
+  pinMode(ledPin, OUTPUT);
+
+  digitalWrite(ledPin, HIGH);
+  
   if(digitalRead(buttonPin) == LOW){
     /* ----- Script-Begin (just a little Hello World example here) ----- */
     Keyboard.begin();
@@ -28,4 +36,8 @@ void setup(){
   }
 }
 
-void loop() {}
+void loop() {
+  ledOn = !ledOn;
+  digitalWrite(ledPin, ledOn);
+  delay(blinkInterval);
+}

@@ -2,8 +2,10 @@
 #include <SD.h>
 #include "Keyboard.h"
 
-#define debug true // <-- uncomment to turn serial output on
+//#define debug true // <-- uncomment to turn serial output on
 #define CSpin 4 //Chip-Select of the SD-Card reader
+#define ledPin 3
+#define blinkInterval 50
 
 //Dip-Switch Pins:
 #define dip1 6
@@ -38,6 +40,7 @@ char buf[buffersize];
 int bufSize = 0;
 int defaultDelay = 5;
 int defaultCharDelay = 5;
+bool ledOn = true;
 
 int getSpace(int start, int end){
   for(int i=start;i<end;i++){
@@ -179,6 +182,9 @@ void setup() {
     delay(2000);
     Serial.println("Started!");
   #endif
+
+  pinMode(ledPin, OUTPUT);
+  digitalWrite(ledPin, HIGH);
   
   String scriptName = ""; // Name of the file that will be opened
 
@@ -233,5 +239,7 @@ void setup() {
 }
 
 void loop() {
-
+  ledOn = !ledOn;
+  digitalWrite(ledPin, ledOn);
+  delay(blinkInterval);
 }
