@@ -209,6 +209,9 @@ class malduinoScriptConverter{
 	}
 	
 	download(){
+		lang = $("#keyboardLayout").val();
+		if($("#scriptName").val().trim().length > 0) name = $("#scriptName").val().trim();
+		else name = "example";
 		if(loaded == 5) createDownload();
 		else{
 			$.ajax({url: url+"/Keyboard_begin.cpp", success: function(result){
@@ -261,10 +264,6 @@ class malduinoScriptConverter{
 
 function createDownload(){
 	if(!$("#compilerMsg").val().includes("error")&&!$("#compilerMsg").val().includes("Error")){
-		lang = $("#keyboardLayout").val();
-		if($("#scriptName").val().trim().length > 0) name = $("#scriptName").val().trim();
-		else name = "example";
-		
 		var zip = new JSZip();
 		var eliteFolder = zip.folder("elite");
 		var liteFolder = zip.folder("lite");
