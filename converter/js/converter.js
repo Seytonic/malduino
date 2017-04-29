@@ -201,8 +201,8 @@ class malduinoScriptConverter{
 		
 		if(script.slice(-1) == '\n') script = script.slice(0,-1);
 		
-		duckyScript = script;
-		arduinoCode = duckuino.compile(duckyScript);
+		duckyScript = script.replace(/\n/g,"\r\n");
+		arduinoCode = duckuino.compile(script);
 		
 		if(useLite) $('#output').val(arduinoCode);
 		else $('#output').val(duckyScript);
