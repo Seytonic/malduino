@@ -133,10 +133,12 @@ void runCommand(int s, int e){
   else if(equals(s,e,"PAGEDOWN",8)) Keyboard.press(KEY_PAGE_DOWN);
   else if(equals(s,e,"SPACE",5)) Keyboard.press(' ');
   else if(equals(s,e,"TAB",3)) Keyboard.press(KEY_TAB);
-  else if(equals(s,e,"UP",2)) Keyboard.press(KEY_UP_ARROW);
-  else if(equals(s,e,"DOWN",4)) Keyboard.press(KEY_DOWN_ARROW);
-  else if(equals(s,e,"LEFT",4)) Keyboard.press(KEY_LEFT_ARROW);
-  else if(equals(s,e,"RIGHT",5)) Keyboard.press(KEY_RIGHT_ARROW);
+  
+  else if(equals(s,e,"UP",2) || equals(s,e,"UPARROW",7)) Keyboard.press(KEY_UP_ARROW);
+  else if(equals(s,e,"DOWN",4) || equals(s,e,"DOWNARROW",9)) Keyboard.press(KEY_DOWN_ARROW);
+  else if(equals(s,e,"LEFT",4) || equals(s,e,"LEFTARROW",9)) Keyboard.press(KEY_LEFT_ARROW);
+  else if(equals(s,e,"RIGHT",5) || equals(s,e,"RIGHTARROW",10)) Keyboard.press(KEY_RIGHT_ARROW);
+  
   else if(equals(s,e,"PRINTSCREEN",11)) Keyboard.press(PRINTSCREEN);
 
   else if(equals(s,e,"F1",3)) Keyboard.press(KEY_F1);
