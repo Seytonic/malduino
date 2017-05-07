@@ -12,7 +12,7 @@ var converter;
 
 var lang;
 var name;
-var url = "/hackstuff/malduino/converter/src";
+var url = "/src";
 
 var keyboardCPPbegin = "";
 var keyboardCPPend = "";
