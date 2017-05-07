@@ -121,7 +121,8 @@ void runCommand(int s, int e){
   else if(equals(s,e,"ENTER",5)) Keyboard.press(KEY_RETURN);
   else if(equals(s,e,"GUI",3) || equals(s,e,"WINDOWS",5)) Keyboard.press(KEY_LEFT_GUI);
   else if(equals(s,e,"SHIFT",5)) Keyboard.press(KEY_LEFT_SHIFT);
-  else if(equals(s,e,"ALT",3)) Keyboard.press(KEY_LEFT_ALT);
+  else if(equals(s,e,"ALT",3)  ||equals(s,e,"ALT_LEFT",8) ||equals(s,e,"ALTLEFT",7)) Keyboard.press(KEY_LEFT_ALT);
+  else if(equals(s,e,"ALT_RIGHT",9) ||equals(s,e,"ALTRIGHT",8)) Keyboard.press(KEY_RIGHT_ALT);
   else if(equals(s,e,"CTRL",4) || equals(s,e,"CONTROL",7)) Keyboard.press(KEY_LEFT_CTRL);
   else if(equals(s,e,"CAPSLOCK",8)) Keyboard.press(KEY_CAPS_LOCK);
   else if(equals(s,e,"DELETE",6)) Keyboard.press(KEY_DELETE);
