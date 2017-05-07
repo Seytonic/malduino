@@ -12,7 +12,7 @@ var converter;
 
 var lang;
 var name;
-var url = "/src";
+var url = "/converter/src";
 
 var keyboardCPPbegin = "";
 var keyboardCPPend = "";
