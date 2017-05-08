@@ -147,7 +147,7 @@ class Duckuino {
 	+ '*/\n'
 	+ '\n'
 	+ '#include "Keyboard.h"\n'
-	+ '#\n'
+	+ '\n'
 	+ '#define blinkInterval 50\n'
 	+ '#define ledPin 3\n'
 	+ '#define buttonPin 6\n'

@@ -189,7 +189,7 @@ class malduinoScriptConverter{
 	}
 	
 	compile(){
-		var script = $('#input').val();
+		var script = $('#input').val()+"\n";
 		script = this.convertLineBreaks(script);
 		
 		if($('#convertALTCodes').prop('checked')) script = this.convertAltCodes(script);
