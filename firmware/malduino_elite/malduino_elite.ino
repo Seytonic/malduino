@@ -18,7 +18,7 @@ For more information see: github.com/seytonic/malduino
 #define dip3 9
 #define dip4 10
 
-#define buffersize 256
+#define buffersize 200
 
 #define KEYPAD_0 234
 #define KEYPAD_1 225
@@ -134,6 +134,7 @@ void runCommand(int s, int e){
   else if(equals(s,e,"PAGEDOWN",8)) Keyboard.press(KEY_PAGE_DOWN);
   else if(equals(s,e,"SPACE",5)) Keyboard.press(' ');
   else if(equals(s,e,"TAB",3)) Keyboard.press(KEY_TAB);
+  else if(equals(s,e,"BACKSPACE",9)) Keyboard.press(KEY_BACKSPACE);
   
   else if(equals(s,e,"UP",2) || equals(s,e,"UPARROW",7)) Keyboard.press(KEY_UP_ARROW);
   else if(equals(s,e,"DOWN",4) || equals(s,e,"DOWNARROW",9)) Keyboard.press(KEY_DOWN_ARROW);
