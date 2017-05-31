@@ -143,15 +143,15 @@ void runCommand(int s, int e){
   
   else if(equals(s,e,"PRINTSCREEN",11)) Keyboard.press(PRINTSCREEN);
 
-  else if(equals(s,e,"F1",3)) Keyboard.press(KEY_F1);
-  else if(equals(s,e,"F2",3)) Keyboard.press(KEY_F2);
-  else if(equals(s,e,"F3",3)) Keyboard.press(KEY_F3);
-  else if(equals(s,e,"F4",3)) Keyboard.press(KEY_F4);
-  else if(equals(s,e,"F5",3)) Keyboard.press(KEY_F5);
-  else if(equals(s,e,"F6",3)) Keyboard.press(KEY_F6);
-  else if(equals(s,e,"F7",3)) Keyboard.press(KEY_F7);
-  else if(equals(s,e,"F8",3)) Keyboard.press(KEY_F8);
-  else if(equals(s,e,"F9",3)) Keyboard.press(KEY_F9);
+  else if(equals(s,e,"F1",2)) Keyboard.press(KEY_F1);
+  else if(equals(s,e,"F2",2)) Keyboard.press(KEY_F2);
+  else if(equals(s,e,"F3",2)) Keyboard.press(KEY_F3);
+  else if(equals(s,e,"F4",2)) Keyboard.press(KEY_F4);
+  else if(equals(s,e,"F5",2)) Keyboard.press(KEY_F5);
+  else if(equals(s,e,"F6",2)) Keyboard.press(KEY_F6);
+  else if(equals(s,e,"F7",2)) Keyboard.press(KEY_F7);
+  else if(equals(s,e,"F8",2)) Keyboard.press(KEY_F8);
+  else if(equals(s,e,"F9",2)) Keyboard.press(KEY_F9);
   else if(equals(s,e,"F10",3)) Keyboard.press(KEY_F10);
   else if(equals(s,e,"F11",3)) Keyboard.press(KEY_F11);
   else if(equals(s,e,"F12",3)) Keyboard.press(KEY_F12);

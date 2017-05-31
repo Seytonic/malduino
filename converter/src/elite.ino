@@ -18,7 +18,7 @@ For more information see: github.com/seytonic/malduino
 #define dip3 9
 #define dip4 10
 
-#define buffersize 256
+#define buffersize 200
 
 #define KEYPAD_0 234
 #define KEYPAD_1 225
@@ -134,6 +134,7 @@ void runCommand(int s, int e){
   else if(equals(s,e,"PAGEDOWN",8)) Keyboard.press(KEY_PAGE_DOWN);
   else if(equals(s,e,"SPACE",5)) Keyboard.press(' ');
   else if(equals(s,e,"TAB",3)) Keyboard.press(KEY_TAB);
+  else if(equals(s,e,"BACKSPACE",9)) Keyboard.press(KEY_BACKSPACE);
   
   else if(equals(s,e,"UP",2) || equals(s,e,"UPARROW",7)) Keyboard.press(KEY_UP_ARROW);
   else if(equals(s,e,"DOWN",4) || equals(s,e,"DOWNARROW",9)) Keyboard.press(KEY_DOWN_ARROW);
@@ -142,15 +143,15 @@ void runCommand(int s, int e){
   
   else if(equals(s,e,"PRINTSCREEN",11)) Keyboard.press(PRINTSCREEN);
 
-  else if(equals(s,e,"F1",3)) Keyboard.press(KEY_F1);
-  else if(equals(s,e,"F2",3)) Keyboard.press(KEY_F2);
-  else if(equals(s,e,"F3",3)) Keyboard.press(KEY_F3);
-  else if(equals(s,e,"F4",3)) Keyboard.press(KEY_F4);
-  else if(equals(s,e,"F5",3)) Keyboard.press(KEY_F5);
-  else if(equals(s,e,"F6",3)) Keyboard.press(KEY_F6);
-  else if(equals(s,e,"F7",3)) Keyboard.press(KEY_F7);
-  else if(equals(s,e,"F8",3)) Keyboard.press(KEY_F8);
-  else if(equals(s,e,"F9",3)) Keyboard.press(KEY_F9);
+  else if(equals(s,e,"F1",2)) Keyboard.press(KEY_F1);
+  else if(equals(s,e,"F2",2)) Keyboard.press(KEY_F2);
+  else if(equals(s,e,"F3",2)) Keyboard.press(KEY_F3);
+  else if(equals(s,e,"F4",2)) Keyboard.press(KEY_F4);
+  else if(equals(s,e,"F5",2)) Keyboard.press(KEY_F5);
+  else if(equals(s,e,"F6",2)) Keyboard.press(KEY_F6);
+  else if(equals(s,e,"F7",2)) Keyboard.press(KEY_F7);
+  else if(equals(s,e,"F8",2)) Keyboard.press(KEY_F8);
+  else if(equals(s,e,"F9",2)) Keyboard.press(KEY_F9);
   else if(equals(s,e,"F10",3)) Keyboard.press(KEY_F10);
   else if(equals(s,e,"F11",3)) Keyboard.press(KEY_F11);
   else if(equals(s,e,"F12",3)) Keyboard.press(KEY_F12);
