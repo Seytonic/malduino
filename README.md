@@ -14,6 +14,9 @@ In `converter` you find the source code for the MalDuino Script Converter: https
 | DEFAULTDELAY				| Time in ms between every command 	|
 | DEFAULTCHARDELAY			| Time in ms between every character|
 | DELAY						| Delay in ms 						|
+| RANDOM					| Returns a random int				|
+| RANDOMMIN					| Set min random value (default 0)  |
+| RANDOMMAX					| Set max random value (default 100)|
 | STRING					| Types the following string 		|
 | REPLAY					| Repeats the last command n times	|
 | GUI						| Windows or CMD key				|
@@ -56,5 +59,19 @@ In `converter` you find the source code for the MalDuino Script Converter: https
 | KEYPAD_PLUS				|
 | KEYPAD_SLASH				|
 | PRINTSCREEN				|
+
+|		Mouse Commands		|
+| ------------------------- |
+| MOUSE X Y					|
+| SCROLL y					|
+| CLICK_LEFT				|
+| CLICK_RIGHT				|
+| CLICK_MIDDLE				|
+| PRESS_LEFT				|
+| PRESS_RIGHT				|
+| PRESS_MIDDLE				|
+| RELEASE_LEFT				|
+| RELEASE_RIGHT				|
+| RELEASE_MIDDLE			|
 
 Based on Hak5's work: [Ducky Script](https://github.com/hak5darren/USB-Rubber-Ducky/wiki/Duckyscript)
