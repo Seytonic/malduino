@@ -141,12 +141,11 @@ class malduinoScriptConverter{
 		
 		for(var i=0;i<lines.length-1;i++){
 			var h = i;
-			var same = (lines[h] == lines[h+1]);
 			var count = 0;
-			while(same && h<lines.length-1 && lines[h+1] != "undefined" && (typeof lines[h+1] !== "undefined")){
+			if(lines[i].indexOf("REPEAT")>=0 && lines[i+1].indexOf("REPEAT")>=0) lines[i+1] = "";
+			while(lines[h] == lines[h+1] && h<lines.length-1 && lines[h+1] != "undefined" && (typeof lines[h+1] !== "undefined")){
 				count++;
 				h++;
-				same = lines[h] == lines[h+1];
 			}
 			if(count > 0){
 				lines[i+1] = "REPEAT "+count;
@@ -156,7 +155,7 @@ class malduinoScriptConverter{
 				lines = _linesBegin.concat(_linesEnd);
 			}
 		}
-
+		
 		str = "";
 		for(var i=0;i<lines.length;i++) str += lines[i]+"\n";
 		
@@ -192,14 +191,16 @@ class malduinoScriptConverter{
 		var script = $('#input').val()+"\n";
 		script = this.convertLineBreaks(script);
 		
+		if($('#autoCorrect').prop('checked')) script = this.autocorrect(script);
 		if($('#convertALTCodes').prop('checked')) script = this.convertAltCodes(script);
 		if($('#deleteComments').prop('checked'))script = this.deleteComments(script);
 		script = this.deleteBreaks(script);
 		if($('#optimize').prop('checked')) script = this.optimize(script);
 		if($('#delay').prop('checked')) script = this.addDelay(script);
-		if($('#autoCorrect').prop('checked')) script = this.autocorrect(script);
 		
 		if(script.slice(-1) == '\n') script = script.slice(0,-1);
+		
+		script = script.replace(/\n\n/gm,"\n");
 		
 		duckyScript = script.replace(/\n/g,"\r\n");
 		arduinoCode = duckuino.compile(script);
