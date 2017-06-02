@@ -170,8 +170,8 @@ class malduinoScriptConverter{
 	}
 
 	autocorrect(str){
-		str = str.replace(new RegExp("^(?!REM).*STRING", 'igm'),"STRING");
-		str = str.replace(new RegExp("^(?!STRING).*REM", 'igm'),"REM");
+		str = str.replace(new RegExp("^(?!REM).*STRING ", 'igm'),"STRING ");
+		str = str.replace(new RegExp("^(?!STRING).*REM ", 'igm'),"REM ");
 		str = str.replace(new RegExp("^( )*", 'igm'),"");
 		
 		var regex = new RegExp(/^(?!(STRING|REM) ).*/igm);
