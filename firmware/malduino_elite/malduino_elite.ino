@@ -1,13 +1,15 @@
 /*
-Copyright (c) 2017 Seytonic, Spacehuhn (Licensed under MIT)
-For more information see: github.com/seytonic/malduino
+  ==============================================================
+    Copyright (c) 2017 Seytonic, Spacehuhn (Licensed under MIT)
+      For more information see: github.com/seytonic/malduino
+  ==============================================================
 */
 
 #include <SPI.h>
 #include <SD.h>
 #include "Keyboard.h"
 
-//#define debug true // <-- uncomment to turn serial output on
+#define debug true // <-- uncomment to turn serial output on
 #define CSpin 4 //Chip-Select of the SD-Card reader
 #define ledPin 3
 #define blinkInterval 50
@@ -18,7 +20,7 @@ For more information see: github.com/seytonic/malduino
 #define dip3 9
 #define dip4 10
 
-#define buffersize 200
+#define buffersize 128
 
 #define KEYPAD_0 234
 #define KEYPAD_1 225
@@ -39,13 +41,13 @@ For more information see: github.com/seytonic/malduino
 #define PRINTSCREEN 206 
 
 File payload;
-char* last = malloc(sizeof(char)*buffersize);
-int lastSize = 0;
 char* buf = malloc(sizeof(char)*buffersize);
 int bufSize = 0;
 int defaultDelay = 5;
 int defaultCharDelay = 5;
 bool ledOn = true;
+
+char* repeatBuffer = malloc(sizeof(char)*12);
 
 int getSpace(int start, int end){
   for(int i=start;i<end;i++){
@@ -54,16 +56,18 @@ int getSpace(int start, int end){
   return -1;
 }
 
-bool equals(int start, int end, char* str, int strLen){
+bool equals(char* strA, int start, int end, char* strB, int strLen){
   if(end-start != strLen) return false;
   for(int i=0;i<strLen;i++){
-    if(buf[start+i] != str[i]) return false;
+    if(strA[start+i] != strB[i]) return false;
   }
   return true;
 }
 
-int getInt(int pos){
-  String amount = String(buf).substring(pos+1,pos+6);
+bool equalsBuffer(int start, int end, char* str){ return equals(buf, start, end, str, String(str).length()); }
+
+int getInt(char* str, int pos){
+  String amount = String(str).substring(pos+1,pos+6);
   return amount.toInt();
 }
 
@@ -82,20 +86,13 @@ void runLine(){
 
   if(space == -1) runCommand(0,bufSize);
   else{
-    if(equals(0,space,"DEFAULTDELAY",12) || equals(0,space,"DEFAULT_DELAY",13)) defaultDelay = getInt(space);
-    else if(equals(0,space,"DEFAULTCHARDELAY",16) || equals(0,space,"DEFAULT_CHAR_DELAY",18)) defaultCharDelay = getInt(space);
-    else if(equals(0,space,"DELAY",5)) delay(getInt(space));
-    else if(equals(0,space,"STRING",6)){
+    if(equalsBuffer(0,space,"DEFAULTDELAY") || equalsBuffer(0,space,"DEFAULT_DELAY")) defaultDelay = getInt(buf,space);
+    else if(equalsBuffer(0,space,"DEFAULTCHARDELAY") || equalsBuffer(0,space,"DEFAULT_CHAR_DELAY")) defaultCharDelay = getInt(buf,space);
+    else if(equalsBuffer(0,space,"DELAY")) delay(getInt(buf,space));
+    else if(equalsBuffer(0,space,"STRING")){
       for(int i=space+1;i<bufSize;i++) KeyboardWrite(buf[i]);
-    }else if(equals(0,space,"REPEAT",6)){
-      int runs = getInt(space);
-      strncpy(buf, last, lastSize);
-      bufSize = lastSize;
-      for(int i=0;i<runs;i++){
-        runLine();
-      }
     }
-    else if(equals(0,space,"REM",3)){}
+    else if(equalsBuffer(0,space,"REM") || equalsBuffer(0,space,"REPEAT")){}
     else{
       runCommand(0,space);
       while(space >= 0 && space < bufSize){
@@ -118,70 +115,69 @@ void runCommand(int s, int e){
   #endif
   
   if(e - s < 2) Keyboard.press(buf[s]);
-  else if(equals(s,e,"ENTER",5)) Keyboard.press(KEY_RETURN);
-  else if(equals(s,e,"GUI",3) || equals(s,e,"WINDOWS",5)) Keyboard.press(KEY_LEFT_GUI);
-  else if(equals(s,e,"SHIFT",5)) Keyboard.press(KEY_LEFT_SHIFT);
-  else if(equals(s,e,"ALT",3)  ||equals(s,e,"ALT_LEFT",8) ||equals(s,e,"ALTLEFT",7)) Keyboard.press(KEY_LEFT_ALT);
-  else if(equals(s,e,"ALT_RIGHT",9) ||equals(s,e,"ALTRIGHT",8)) Keyboard.press(KEY_RIGHT_ALT);
-  else if(equals(s,e,"CTRL",4) || equals(s,e,"CONTROL",7)) Keyboard.press(KEY_LEFT_CTRL);
-  else if(equals(s,e,"CAPSLOCK",8)) Keyboard.press(KEY_CAPS_LOCK);
-  else if(equals(s,e,"DELETE",6)) Keyboard.press(KEY_DELETE);
-  else if(equals(s,e,"END",3)) Keyboard.press(KEY_END);
-  else if(equals(s,e,"ESC",3) || equals(s,e,"ESCAPE",6)) Keyboard.press(KEY_ESC);
-  else if(equals(s,e,"HOME",4)) Keyboard.press(KEY_HOME);
-  else if(equals(s,e,"INSERT",6)) Keyboard.press(KEY_INSERT);
-  else if(equals(s,e,"PAGEUP",6)) Keyboard.press(KEY_PAGE_UP);
-  else if(equals(s,e,"PAGEDOWN",8)) Keyboard.press(KEY_PAGE_DOWN);
-  else if(equals(s,e,"SPACE",5)) Keyboard.press(' ');
-  else if(equals(s,e,"TAB",3)) Keyboard.press(KEY_TAB);
-  else if(equals(s,e,"BACKSPACE",9)) Keyboard.press(KEY_BACKSPACE);
+  else if(equalsBuffer(s,e,"ENTER")) Keyboard.press(KEY_RETURN);
+  else if(equalsBuffer(s,e,"GUI") || equalsBuffer(s,e,"WINDOWS")) Keyboard.press(KEY_LEFT_GUI);
+  else if(equalsBuffer(s,e,"SHIFT")) Keyboard.press(KEY_LEFT_SHIFT);
+  else if(equalsBuffer(s,e,"ALT")  ||equalsBuffer(s,e,"ALT_LEFT") ||equalsBuffer(s,e,"ALTLEFT")) Keyboard.press(KEY_LEFT_ALT);
+  else if(equalsBuffer(s,e,"ALT_RIGHT") ||equalsBuffer(s,e,"ALTRIGHT")) Keyboard.press(KEY_RIGHT_ALT);
+  else if(equalsBuffer(s,e,"CTRL") || equalsBuffer(s,e,"CONTROL")) Keyboard.press(KEY_LEFT_CTRL);
+  else if(equalsBuffer(s,e,"CAPSLOCK")) Keyboard.press(KEY_CAPS_LOCK);
+  else if(equalsBuffer(s,e,"DELETE")) Keyboard.press(KEY_DELETE);
+  else if(equalsBuffer(s,e,"END")) Keyboard.press(KEY_END);
+  else if(equalsBuffer(s,e,"ESC") || equalsBuffer(s,e,"ESCAPE")) Keyboard.press(KEY_ESC);
+  else if(equalsBuffer(s,e,"HOME")) Keyboard.press(KEY_HOME);
+  else if(equalsBuffer(s,e,"INSERT")) Keyboard.press(KEY_INSERT);
+  else if(equalsBuffer(s,e,"PAGEUP")) Keyboard.press(KEY_PAGE_UP);
+  else if(equalsBuffer(s,e,"PAGEDOWN")) Keyboard.press(KEY_PAGE_DOWN);
+  else if(equalsBuffer(s,e,"SPACE")) Keyboard.press(' ');
+  else if(equalsBuffer(s,e,"TAB")) Keyboard.press(KEY_TAB);
+  else if(equalsBuffer(s,e,"BACKSPACE")) Keyboard.press(KEY_BACKSPACE);
   
-  else if(equals(s,e,"UP",2) || equals(s,e,"UPARROW",7)) Keyboard.press(KEY_UP_ARROW);
-  else if(equals(s,e,"DOWN",4) || equals(s,e,"DOWNARROW",9)) Keyboard.press(KEY_DOWN_ARROW);
-  else if(equals(s,e,"LEFT",4) || equals(s,e,"LEFTARROW",9)) Keyboard.press(KEY_LEFT_ARROW);
-  else if(equals(s,e,"RIGHT",5) || equals(s,e,"RIGHTARROW",10)) Keyboard.press(KEY_RIGHT_ARROW);
+  else if(equalsBuffer(s,e,"UP") || equalsBuffer(s,e,"UPARROW")) Keyboard.press(KEY_UP_ARROW);
+  else if(equalsBuffer(s,e,"DOWN") || equalsBuffer(s,e,"DOWNARROW")) Keyboard.press(KEY_DOWN_ARROW);
+  else if(equalsBuffer(s,e,"LEFT") || equalsBuffer(s,e,"LEFTARROW")) Keyboard.press(KEY_LEFT_ARROW);
+  else if(equalsBuffer(s,e,"RIGHT") || equalsBuffer(s,e,"RIGHTARROW")) Keyboard.press(KEY_RIGHT_ARROW);
   
-  else if(equals(s,e,"PRINTSCREEN",11)) Keyboard.press(PRINTSCREEN);
+  else if(equalsBuffer(s,e,"PRINTSCREEN")) Keyboard.press(PRINTSCREEN);
 
-  else if(equals(s,e,"F1",2)) Keyboard.press(KEY_F1);
-  else if(equals(s,e,"F2",2)) Keyboard.press(KEY_F2);
-  else if(equals(s,e,"F3",2)) Keyboard.press(KEY_F3);
-  else if(equals(s,e,"F4",2)) Keyboard.press(KEY_F4);
-  else if(equals(s,e,"F5",2)) Keyboard.press(KEY_F5);
-  else if(equals(s,e,"F6",2)) Keyboard.press(KEY_F6);
-  else if(equals(s,e,"F7",2)) Keyboard.press(KEY_F7);
-  else if(equals(s,e,"F8",2)) Keyboard.press(KEY_F8);
-  else if(equals(s,e,"F9",2)) Keyboard.press(KEY_F9);
-  else if(equals(s,e,"F10",3)) Keyboard.press(KEY_F10);
-  else if(equals(s,e,"F11",3)) Keyboard.press(KEY_F11);
-  else if(equals(s,e,"F12",3)) Keyboard.press(KEY_F12);
+  else if(equalsBuffer(s,e,"F1")) Keyboard.press(KEY_F1);
+  else if(equalsBuffer(s,e,"F2")) Keyboard.press(KEY_F2);
+  else if(equalsBuffer(s,e,"F3")) Keyboard.press(KEY_F3);
+  else if(equalsBuffer(s,e,"F4")) Keyboard.press(KEY_F4);
+  else if(equalsBuffer(s,e,"F5")) Keyboard.press(KEY_F5);
+  else if(equalsBuffer(s,e,"F6")) Keyboard.press(KEY_F6);
+  else if(equalsBuffer(s,e,"F7")) Keyboard.press(KEY_F7);
+  else if(equalsBuffer(s,e,"F8")) Keyboard.press(KEY_F8);
+  else if(equalsBuffer(s,e,"F9")) Keyboard.press(KEY_F9);
+  else if(equalsBuffer(s,e,"F10")) Keyboard.press(KEY_F10);
+  else if(equalsBuffer(s,e,"F11")) Keyboard.press(KEY_F11);
+  else if(equalsBuffer(s,e,"F12")) Keyboard.press(KEY_F12);
 
-  else if(equals(s,e,"NUM_0",5)) KeyboardWrite(KEYPAD_0);
-  else if(equals(s,e,"NUM_1",5)) KeyboardWrite(KEYPAD_1);
-  else if(equals(s,e,"NUM_2",5)) KeyboardWrite(KEYPAD_2);
-  else if(equals(s,e,"NUM_3",5)) KeyboardWrite(KEYPAD_3);
-  else if(equals(s,e,"NUM_4",5)) KeyboardWrite(KEYPAD_4);
-  else if(equals(s,e,"NUM_5",5)) KeyboardWrite(KEYPAD_5);
-  else if(equals(s,e,"NUM_6",5)) KeyboardWrite(KEYPAD_6);
-  else if(equals(s,e,"NUM_7",5)) KeyboardWrite(KEYPAD_7);
-  else if(equals(s,e,"NUM_8",5)) KeyboardWrite(KEYPAD_8);
-  else if(equals(s,e,"NUM_9",5)) KeyboardWrite(KEYPAD_9);
-  else if(equals(s,e,"NUM_ASTERIX",11)) KeyboardWrite(KEYPAD_ASTERIX);
-  else if(equals(s,e,"NUM_ENTER",9)) KeyboardWrite(KEYPAD_ENTER);
-  else if(equals(s,e,"NUM_Minus",9)) KeyboardWrite(KEYPAD_MINUS);
-  else if(equals(s,e,"NUM_PERIOD",10)) KeyboardWrite(KEYPAD_PERIOD);
-  else if(equals(s,e,"NUM_PLUS",8)) KeyboardWrite(KEYPAD_PLUS);
+  else if(equalsBuffer(s,e,"NUM_0")) KeyboardWrite(KEYPAD_0);
+  else if(equalsBuffer(s,e,"NUM_1")) KeyboardWrite(KEYPAD_1);
+  else if(equalsBuffer(s,e,"NUM_2")) KeyboardWrite(KEYPAD_2);
+  else if(equalsBuffer(s,e,"NUM_3")) KeyboardWrite(KEYPAD_3);
+  else if(equalsBuffer(s,e,"NUM_4")) KeyboardWrite(KEYPAD_4);
+  else if(equalsBuffer(s,e,"NUM_5")) KeyboardWrite(KEYPAD_5);
+  else if(equalsBuffer(s,e,"NUM_6")) KeyboardWrite(KEYPAD_6);
+  else if(equalsBuffer(s,e,"NUM_7")) KeyboardWrite(KEYPAD_7);
+  else if(equalsBuffer(s,e,"NUM_8")) KeyboardWrite(KEYPAD_8);
+  else if(equalsBuffer(s,e,"NUM_9")) KeyboardWrite(KEYPAD_9);
+  else if(equalsBuffer(s,e,"NUM_ASTERIX")) KeyboardWrite(KEYPAD_ASTERIX);
+  else if(equalsBuffer(s,e,"NUM_ENTER")) KeyboardWrite(KEYPAD_ENTER);
+  else if(equalsBuffer(s,e,"NUM_Minus")) KeyboardWrite(KEYPAD_MINUS);
+  else if(equalsBuffer(s,e,"NUM_PERIOD")) KeyboardWrite(KEYPAD_PERIOD);
+  else if(equalsBuffer(s,e,"NUM_PLUS")) KeyboardWrite(KEYPAD_PLUS);
 
-  #ifdef debug 
-      else Serial.println("failed");
-  #endif
-  
+#ifdef debug
+  else Serial.println("failed to find command");
+#endif
   /* not implemented
-  else if(equals(s,e,"APP",3)) Keyboard.press();
-  else if(equals(s,e,"MENU",4)) Keyboard.press();
-  else if(equals(s,e,"BREAK",5) || equals(s,e,"PAUSE",5)) Keyboard.press();
-  else if(equals(s,e,"NUMLOCK",7)) Keyboard.press();
-  else if(equals(s,e,"SCROLLLOCK",10)) Keyboard.press();
+  else if(equalsBuffer(s,e,"APP")) Keyboard.press();
+  else if(equalsBuffer(s,e,"MENU")) Keyboard.press();
+  else if(equalsBuffer(s,e,"BREAK") || equalsBuffer(s,e,"PAUSE",5)) Keyboard.press();
+  else if(equalsBuffer(s,e,"NUMLOCK")) Keyboard.press();
+  else if(equalsBuffer(s,e,"SCROLLLOCK")) Keyboard.press();
   */
 }
 
@@ -218,9 +214,9 @@ void setup() {
 
   payload = SD.open(scriptName);
   if(!payload){
-    #ifdef debug 
-      Serial.println("couldn't find script: '"+String(scriptName)+"'");
-    #endif
+#ifdef debug 
+    Serial.println("couldn't find script: '"+String(scriptName)+"'");
+#endif
     return;
   }else{
     Keyboard.begin();
@@ -229,17 +225,37 @@ void setup() {
       buf[bufSize] = payload.read();
       if(buf[bufSize] == '\r' || buf[bufSize] == '\n' || bufSize >= buffersize){
         if(buf[bufSize] == '\r' && payload.peek() == '\n') payload.read();
+        
+        //---------REPEAT---------     
+        int repeatBufferSize = 0;
+        int repeats = 0;
+        unsigned long payloadPosition = payload.position();
+        
+        for(int i=0;i<12;i++){
+          if(payload.available()){
+            repeatBuffer[repeatBufferSize] = payload.read();
+            repeatBufferSize++;
+          }else break;
+        }
+
+        if(repeatBufferSize > 6){
+          if(equals(repeatBuffer, 0, 6, "REPEAT", 6)){
+            repeats = getInt(repeatBuffer, 6);
+          }
+        }
+
+        for(int i=0;i<repeats;i++) runLine();
+        
+        payload.seek(payloadPosition);
+        //------------------------
+        
         runLine();
-        strncpy(last, buf, bufSize);
-        lastSize = bufSize;
         bufSize = 0;
       }
       else bufSize++;
     }
     if(bufSize > 0){
       runLine();
-      strncpy(last, buf, bufSize);
-      lastSize = bufSize;
       bufSize = 0;
     }
     payload.close();
