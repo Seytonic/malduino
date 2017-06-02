@@ -7,7 +7,7 @@ var duckyScript = "";
 var arduinoCode = "";
 var duckuino = new Duckuino();
 var compilerMsg = "";
-var maxlen = 200 - 7;
+var maxlen = 256 - 7;
 var converter;
 
 var lang;
