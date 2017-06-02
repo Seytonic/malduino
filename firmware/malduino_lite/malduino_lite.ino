@@ -4,6 +4,7 @@ For more information see: github.com/seytonic/malduino
 */
 
 #include "Keyboard.h"
+#include "Mouse.h"
 
 #define blinkInterval 50
 #define ledPin 3
@@ -27,9 +28,11 @@ void setup(){
   digitalWrite(ledPin, HIGH);
   
   if(digitalRead(buttonPin) == LOW){
-    /* ----- Script-Begin (just a little Hello World example here) ----- */
-    Keyboard.begin();
     
+    Keyboard.begin();
+    Mouse.begin();
+
+    /* ----- Script-Begin (just a little Hello World example here) ----- */
     delay(1000);
   
     delay(defaultDelay);

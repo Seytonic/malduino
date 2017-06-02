@@ -8,6 +8,7 @@
 #include <SPI.h>
 #include <SD.h>
 #include "Keyboard.h"
+#include "Mouse.h"
 
 #define debug true // <-- uncomment to turn serial output on
 #define CSpin 4 //Chip-Select of the SD-Card reader
@@ -42,12 +43,15 @@
 
 File payload;
 char* buf = malloc(sizeof(char)*buffersize);
+char* repeatBuffer = malloc(sizeof(char)*12);
+
 int bufSize = 0;
 int defaultDelay = 5;
 int defaultCharDelay = 5;
 bool ledOn = true;
+int rMin = -100;
+int rMax = 100;
 
-char* repeatBuffer = malloc(sizeof(char)*12);
 
 int getSpace(int start, int end){
   for(int i=start;i<end;i++){
@@ -64,11 +68,19 @@ bool equals(char* strA, int start, int end, char* strB, int strLen){
   return true;
 }
 
+int toPositive(int num){
+  if(num < 0) return num*(-1);
+  else return num;
+}
+
 bool equalsBuffer(int start, int end, char* str){ return equals(buf, start, end, str, String(str).length()); }
 
 int getInt(char* str, int pos){
-  String amount = String(str).substring(pos+1,pos+6);
-  return amount.toInt();
+  if(equals(str, pos+1, pos+7, "RANDOM", 6)){
+    return random(rMin, rMax);
+  }else{
+    return String(str).substring(pos+1,pos+6).toInt();
+  }
 }
 
 void KeyboardWrite(uint8_t c){  
@@ -92,6 +104,18 @@ void runLine(){
     else if(equalsBuffer(0,space,"STRING")){
       for(int i=space+1;i<bufSize;i++) KeyboardWrite(buf[i]);
     }
+    else if(equalsBuffer(0,space,"MOUSE")){
+      int nSpace = getSpace(space+1,bufSize);
+      int x = getInt(buf,space);
+      int y = getInt(buf,nSpace);
+      Mouse.move(x,y);
+      #ifdef debug 
+        Serial.println("Move mouse "+(String)x+" "+(String)y);
+      #endif
+    }
+    else if(equalsBuffer(0,space,"SCROLL")) Mouse.move(0,0,getInt(buf,space));
+    else if(equalsBuffer(0,space,"RANDOMMIN")) rMin = getInt(buf,space);
+    else if(equalsBuffer(0,space,"RANDOMMAX")) rMax = getInt(buf,space);
     else if(equalsBuffer(0,space,"REM") || equalsBuffer(0,space,"REPEAT")){}
     else{
       runCommand(0,space);
@@ -169,6 +193,17 @@ void runCommand(int s, int e){
   else if(equalsBuffer(s,e,"NUM_PERIOD")) KeyboardWrite(KEYPAD_PERIOD);
   else if(equalsBuffer(s,e,"NUM_PLUS")) KeyboardWrite(KEYPAD_PLUS);
 
+  else if(equalsBuffer(s,e,"CLICK") || equalsBuffer(s,e,"CLICK_LEFT")) Mouse.click();
+  else if(equalsBuffer(s,e,"CLICK_RIGHT")) Mouse.click(MOUSE_RIGHT);
+  else if(equalsBuffer(s,e,"CLICK_MIDDLE")) Mouse.click(MOUSE_MIDDLE);
+  
+  else if(equalsBuffer(s,e,"PRESS") || equalsBuffer(s,e,"PRESS_LEFT")) Mouse.press();
+  else if(equalsBuffer(s,e,"PRESS_LEFT")) Mouse.press(MOUSE_RIGHT);
+  else if(equalsBuffer(s,e,"PRESS_MIDDLE")) Mouse.press(MOUSE_MIDDLE);
+  else if(equalsBuffer(s,e,"RELEASE") || equalsBuffer(s,e,"RELEASE_LEFT")) Mouse.release();
+  else if(equalsBuffer(s,e,"RELEASE_LEFT")) Mouse.release(MOUSE_RIGHT);
+  else if(equalsBuffer(s,e,"RELEASE_MIDDLE")) Mouse.release(MOUSE_MIDDLE);
+  
 #ifdef debug
   else Serial.println("failed to find command");
 #endif
@@ -187,7 +222,9 @@ void setup() {
     delay(2000);
     Serial.println("Started!");
   #endif
-
+  
+  randomSeed(analogRead(0));
+   
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, HIGH);
   
@@ -220,6 +257,7 @@ void setup() {
     return;
   }else{
     Keyboard.begin();
+    Mouse.begin();
     while(payload.available()){
 
       buf[bufSize] = payload.read();
@@ -259,6 +297,7 @@ void setup() {
       bufSize = 0;
     }
     payload.close();
+    Mouse.end();
     Keyboard.end();
   }
 }
