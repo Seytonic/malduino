@@ -92,6 +92,21 @@ var comboMap = {
   SHIFT:'KEY_LEFT_SHIFT'
 };
 
+var mouseMap = {
+  CLICK:'click()',
+  CLICK_LEFT:'click()',
+  CLICK_RIGHT:'click(MOUSE_RIGHT)',
+  CLICK_MIDDLE:'click(MOUSE_MIDDLE)',
+  PRESS:'press()',
+  PRESS_LEFT:'press()',
+  PRESS_RIGHT:'press(MOUSE_RIGHT)',
+  PRESS_MIDDLE:'press(MOUSE_MIDDLE)',
+  RELEASE:'release()',
+  RELEASE_LEFT:'release()',
+  RELEASE_RIGHT:'release(MOUSE_RIGHT)',
+  RELEASE_MIDDLE:'release(MOUSE_MIDDLE)'
+}
+
 var keyMap = {
   a:'97',
   b:'98',
@@ -126,6 +141,7 @@ class Duckuino {
     this.keyMap = keyMap;
     this.commandMap = commandMap;
     this.comboMap = comboMap;
+	this.mouseMap = mouseMap;
   }
 
   compile(inputCode){
@@ -156,6 +172,8 @@ class Duckuino {
 	+ '\n'
 	+ 'int defaultDelay = 4;\n'
 	+ 'int defaultCharDelay = 5;\n'
+	+ 'int rMin = 0;\n'
+	+ 'int rMax = 100;\n'
 	+ '\n'
 	+ 'bool ledOn = true;\n'
     + '\n'
@@ -307,24 +325,7 @@ class Duckuino {
             return;
           }
           break;
-        case "TYPE":
-          wordArray.shift();
-
-          if(wordArray[0] === undefined || wordArray[0] === '') {
-            _error('Error: at line: ' + (i + 1) + ', TYPE needs a key');
-            return;
-          }
-
-          if (keyMap[wordArray[0]] !== undefined)
-          {
-            commandKnown = true;
-            // Replace the DuckyScript key by the Arduino key name
-            parsedOut += '    typeKey(' + keyMap[wordArray[0]] + ');\n';
-          } else {
-            _error('Error: Unknown letter \'' + wordArray[0] +'\' at line: ' + (i + 1));
-            return;
-          }
-          break;
+		  
         case "REM":
           wordArray.shift();
 
@@ -338,37 +339,55 @@ class Duckuino {
             return;
           }
           break;
-        case "MOUSEMOVE":
+		  
+        case "MOUSE":
           wordArray.shift();
-          if (wordArray[0] != undefined && wordArray[0] != ''){
+          if (wordArray[0] != undefined && wordArray[0] != ' ' && wordArray[1] != undefined && wordArray[1] != ' '){
             commandKnown = true;
-            var mouseParams = wordArray[0].split(',');
-            parsedOut += '    AbsoluteMouse.move('+mouseParams[0]+', '+mouseParams[1];
-
-            if(mouseParams[2] != undefined && mouseParams[2] != ''){
-              parsedOut += ', '+mouseParams[2];
-            }
-
-            parsedOut += ');\n';
+            parsedOut += '    Mouse.move('+wordArray[0]+', '+wordArray[1] + ');\n';
             wordArray.shift();
           } else {
-            _error('Error: at line: ' + (i + 1) + ', MOUSEMOVE requires at least two parameters')
+            _error('Error: at line: ' + (i + 1) + ', MOUSE requires at least two parameters')
             return;
           }
-          break;       
-        case "MOUSECLICK":
-          wordArray.shift();
-          wordArray[0] = wordArray[0].toUpperCase();
+          break;  
 
-          if (wordArray[0] == 'LEFT' || wordArray[0] == 'RIGHT' || wordArray[0] == 'MIDDLE' && wordArray[0] != undefined && wordArray[0] != ''){
+        case "SCROLL":
+          wordArray.shift();
+		  if (wordArray[0] != undefined && wordArray[0] != ''){
             commandKnown = true;
-            parsedOut += ' AbsoluteMouse.click(MOUSE_'+wordArray[0]+');\n'
+            parsedOut += '    Mouse.move(0,0,'+wordArray[0]+');\n'
             wordArray.shift();
           } else {
-            _error('Error: at line: ' + (i + 1) + ', MOUSECLICK requires key (left/middle/right)')
+            _error('Error: at line: ' + (i + 1) + ', SCROLL requires a parameter')
             return;
           }
           break;
+		  
+		case "RANDOMMIN":
+          wordArray.shift();
+		  if (wordArray[0] != undefined && wordArray[0] != ''){
+            commandKnown = true;
+            parsedOut += '    RANDOMMIN = '+wordArray[0]+';\n'
+            wordArray.shift();
+          } else {
+            _error('Error: at line: ' + (i + 1) + ', RANDOMMIN requires a parameter')
+            return;
+          }
+          break;
+		
+		case "RANDOMMAX":
+          wordArray.shift();
+		  if (wordArray[0] != undefined && wordArray[0] != ''){
+            commandKnown = true;
+            parsedOut += '    RANDOMMAX = '+wordArray[0]+';\n'
+            wordArray.shift();
+          } else {
+            _error('Error: at line: ' + (i + 1) + ', RANDOMMAX requires a parameter')
+            return;
+          }
+          break;
+		  
         case "REPEAT":
         case "REPLAY":
           wordArray.shift();
@@ -422,7 +441,15 @@ class Duckuino {
               commandKnown = true;
 
               parsedOut += '    typeKey(' + commandMap[wordArray[0]] + ');\n';
-            }else {
+            }else if (numpadMap[wordArray[0]] !== undefined){
+			  commandKnown = true;
+              releaseAll = true;
+
+              parsedOut += '    typeKey(' + numpadMap[wordArray[0]] + ');\n';
+			}else if (mouseMap[wordArray[0]] !== undefined){
+			  commandKnown = true;
+              parsedOut += '    Mouse.' + mouseMap[wordArray[0]] + ';\n';
+			}else {
               commandKnown = false;
               break;
             }
@@ -450,6 +477,9 @@ class Duckuino {
               releaseAll = true;
 
               parsedOut += '    typeKey(' + numpadMap[wordArray[0]] + ');\n';
+			}else if (mouseMap[wordArray[0]] !== undefined){
+			  commandKnown = true;
+              parsedOut += '    Mouse.' + mouseMap[wordArray[0]] + ';\n';
 			}else {
               commandKnown = false;
               break;
@@ -477,6 +507,7 @@ class Duckuino {
     var timePassed = new Date(timerEnd - timerStart);
 
     log('Successfuly parsed ' + (lineArray.length) + ' lines in ' + timePassed.getMilliseconds() + 'ms');
-    return parsedScript;
+    parsedScript = parsedScript.replace('RANDOM','random(rMin,rMax)');
+	return parsedScript;
   }
 }

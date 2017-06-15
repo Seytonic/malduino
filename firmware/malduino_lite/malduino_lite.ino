@@ -13,6 +13,8 @@ For more information see: github.com/seytonic/malduino
 int defaultDelay = 4;
 int defaultCharDelay = 5;
 bool ledOn = true;
+int rMin = 0;
+int rMax = 100;
 
 void typeKey(int key){
   Keyboard.press(key);
