@@ -14,11 +14,22 @@ size_t Keyboard_::press(uint8_t k)
 		_keyReport.modifiers |= (1<<(k-128));
 		k = 0;
 	} else {				// it's a printing key
+		int oldKey = k;
 		k = pgm_read_byte(_asciimap + k);
 		if (!k) {
 			setWriteError();
 			return 0;
 		}
+		
+		#ifdef ADD_ALTGR
+		if (!_altFine) initAltGr();
+		if (_altGrMap[oldKey]){
+		  _keyReport.modifiers |= 0x40;
+		} else {
+		  _keyReport.modifiers = 0;
+		}
+		#endif
+		
 		if (k & 0x80) {						// it's a capital letter or other character reached with shift
 			_keyReport.modifiers |= 0x02;	// the left shift modifier
 			k &= 0x7F;
