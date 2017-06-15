@@ -193,7 +193,7 @@ void runCommand(int s, int e){
   else if(equalsBuffer(s,e,"NUM_PERIOD")) KeyboardWrite(KEYPAD_PERIOD);
   else if(equalsBuffer(s,e,"NUM_PLUS")) KeyboardWrite(KEYPAD_PLUS);
 
-  else if(equalsBuffer(s,e,"CLICK") || equalsBuffer(s,e,"CLICK_LEFT")) Mouse.click();
+  else if(equalsBuffer(s,e,"CLICK")  || equalsBuffer(s,e,"CLICK_LEFT") || equalsBuffer(s,e,"MOUSECLICK")) Mouse.click();
   else if(equalsBuffer(s,e,"CLICK_RIGHT")) Mouse.click(MOUSE_RIGHT);
   else if(equalsBuffer(s,e,"CLICK_MIDDLE")) Mouse.click(MOUSE_MIDDLE);
   
