@@ -63,7 +63,7 @@ In `converter` you find the source code for the MalDuino Script Converter: https
 |		Mouse Commands		|
 | ------------------------- |
 | MOUSE X Y					|
-| SCROLL y					|
+| SCROLL Y					|
 | CLICK_LEFT				|
 | CLICK_RIGHT				|
 | CLICK_MIDDLE				|
