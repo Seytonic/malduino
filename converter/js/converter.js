@@ -227,6 +227,7 @@ class malduinoScriptConverter{
 					$.ajax({url: url+"/locales/"+lang+".lang", success: function(result){
 						langFile = result;
 						if(lang == "es_ES") keyboardCPP = "#define ADD_ALTGR\r\n";
+						if(lang == "de_DE") keyboardCPP = "#define ADD_ALTGR\r\n";
 						keyboardCPP += keyboardCPPbegin + langCopyrightNotice + langFile + keyboardCPPend;
 						loaded++;
 						
