@@ -1,4 +1,4 @@
-/*
+n/*
   ==============================================================
     Copyright (c) 2017 Seytonic, Spacehuhn (Licensed under MIT)
       For more information see: github.com/seytonic/malduino
@@ -21,7 +21,7 @@
 #define dip3 9
 #define dip4 10
 
-#define buffersize 128
+#define buffersize 256
 
 #define KEYPAD_0 234
 #define KEYPAD_1 225
