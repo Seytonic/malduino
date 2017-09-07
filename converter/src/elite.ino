@@ -21,7 +21,7 @@
 #define dip3 9
 #define dip4 10
 
-#define buffersize 128
+#define buffersize 256
 
 #define KEYPAD_0 234
 #define KEYPAD_1 225
