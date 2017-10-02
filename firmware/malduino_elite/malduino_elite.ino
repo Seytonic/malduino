@@ -242,7 +242,7 @@ void setup() {
 
   scriptName += ".txt";
 
-  if(!SD.begin(4)) {
+  if(!SD.begin(CSpin)) {
     #ifdef debug 
       Serial.println("couldn't access sd-card :(");
     #endif
