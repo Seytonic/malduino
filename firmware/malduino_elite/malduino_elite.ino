@@ -209,6 +209,15 @@ void runCommand(int s, int e){
   else if(equalsBuffer(s,e,"RELEASE") || equalsBuffer(s,e,"RELEASE_LEFT")) Mouse.release();
   else if(equalsBuffer(s,e,"RELEASE_LEFT")) Mouse.release(MOUSE_RIGHT);
   else if(equalsBuffer(s,e,"RELEASE_MIDDLE")) Mouse.release(MOUSE_MIDDLE);
+  
+  else if(equalsBuffer(s,e,"VOLUME_UP")) BootKeyboard.write(MEDIA_VOLUME_UP);
+  else if(equalsBuffer(s,e,"VOLUME_DOWN")) BootKeyboard.write(MEDIA_VOLUME_DOWN);
+  else if(equalsBuffer(s,e,"PAUSE")) BootKeyboard.write(MEDIA_PLAY_PAUSE);
+  else if(equalsBuffer(s,e,"STOP")) BootKeyboard.write(MEDIA_STOP);
+  
+  else if(equalsBuffer(s,e,"SHUT_DOWN")) BootKeyboard.write(SYSTEM_POWER_DOWN);
+  else if(equalsBuffer(s,e,"SLEEP")) BootKeyboard.write(SYSTEM_SLEEP);
+  else if(equalsBuffer(s,e,"WAKE_UP")) BootKeyboard.write(SYSTEM_WAKE_UP);
 
 #ifdef debug
   else Serial.println("failed to find command");
