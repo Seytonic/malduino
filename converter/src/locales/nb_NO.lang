@@ -3,7 +3,7 @@
  * Due to how the norwegian keyboard works some characters (~, ^, `)  have to be pressed twice, on ubuntu two presses creates one character, on windows one press creates no charater and two presses creates two.
  *
  * This means that the required test string is "!\"#$%&'()*+,-./0123456789:;<=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^^``_abcdefghijklmnopqrstuvwxyz{|}~~ @"
- * Note that the two backslashes are just escaping the backslash. Backslashes don't have to be pressed twice on danish keyboards.
+ * Note that the two backslashes are just escaping the backslash. Backslashes don't have to be pressed twice on norwegian keyboards.
  */
 
 #define SHIFT 0x80
