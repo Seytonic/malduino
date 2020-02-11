@@ -1,4 +1,4 @@
-n/*
+/*
   ==============================================================
     Copyright (c) 2017 Seytonic, Spacehuhn (Licensed under MIT)
       For more information see: github.com/seytonic/malduino
@@ -10,7 +10,7 @@ n/*
 #include "Keyboard.h"
 #include "Mouse.h"
 
-#define debug true // <-- uncomment to turn serial output on
+//#define debug true // <-- uncomment to turn serial output on
 #define CSpin 4 //Chip-Select of the SD-Card reader
 #define ledPin 3
 #define blinkInterval 50
