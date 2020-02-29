@@ -1,4 +1,4 @@
-n/*
+/*
   ==============================================================
     Copyright (c) 2017 Seytonic, Spacehuhn (Licensed under MIT)
       For more information see: github.com/seytonic/malduino
