@@ -231,6 +231,7 @@ class malduinoScriptConverter{
 						if(lang == "it_IT") keyboardCPP = "#define ADD_ALTGR\r\n";
 						if(lang == "sv_SE") keyboardCPP = "#define ADD_ALTGR\r\n";
 						if(lang == "fi_FI") keyboardCPP = "#define ADD_ALTGR\r\n";
+						if(lang == "pt_BR") keyboardCPP = "#define ADD_ALTGR\r\n";
 						if(lang == "tr_TR") keyboardCPP = "#define ADD_ALTGR\r\n";
 						if(lang == "cs_CZ_QWERTY") keyboardCPP = "#define ADD_ALTGR\r\n";
 						if(lang == "cs_CZ_QWERTZ") keyboardCPP = "#define ADD_ALTGR\r\n";						
